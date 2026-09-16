@@ -1,0 +1,92 @@
+{
+  "schema_version": "pds-schema-v2",
+  "description": "플랜두씨 다이어리 1 (T06) - 실제 Supabase Postgres 스키마 및 날짜 규칙",
+  "database": "Supabase Postgres (project: kdlnzkdltpccimhnbvdz)",
+  "auth": "없음 (T06 범위). RLS 비활성화 - anon/publishable 키로 전체 테이블 읽기/쓰기 가능. 인증은 T07에서 추가 예정.",
+  "date_rules": {
+    "storage": "모든 timestamptz 컬럼은 UTC로 저장된다 (Postgres timestamptz 기본).",
+    "display": "브라우저의 Date 객체와 toLocaleString('ko-KR')로 표시 시점에 로컬 변환한다.",
+    "today_for_overdue_check": "지연(overdue) 판정에 쓰는 '오늘'은 브라우저 로컬 시간대와 무관하게 UTC+9(서울) 기준으로 별도 계산한다 (seoulTodayISO 함수).",
+    "date_only_fields": "plans.period_start/period_end, todos.due_date는 시간 정보 없는 date 타입으로 저장한다."
+  },
+  "tables": [
+    {
+      "name": "plans",
+      "purpose": "사용자가 세운 계획 원본. 수정해도 이 행은 최신 내용으로 갱신되고, 수정 전 내용은 plan_revisions에 자동 보존된다.",
+      "columns": [
+        { "name": "id", "type": "uuid", "note": "기본키, 자동 생성" },
+        { "name": "period_start", "type": "date" },
+        { "name": "period_end", "type": "date" },
+        { "name": "priority", "type": "text", "note": "'높음' | '중간' | '낮음'" },
+        { "name": "success_criteria", "type": "text" },
+        { "name": "estimated_minutes", "type": "numeric" },
+        { "name": "created_at", "type": "timestamptz", "default": "now()" },
+        { "name": "updated_at", "type": "timestamptz", "note": "UPDATE 트리거가 자동 갱신" }
+      ]
+    },
+    {
+      "name": "plan_revisions",
+      "purpose": "plans UPDATE 직전 값의 스냅샷. plans에 BEFORE UPDATE 트리거(fn_snapshot_plan_before_update)가 붙어 있어, 앱 코드가 아니라 DB가 강제로 이력을 남긴다.",
+      "columns": [
+        { "name": "id", "type": "uuid" },
+        { "name": "plan_id", "type": "uuid", "references": "plans.id" },
+        { "name": "period_start", "type": "date" },
+        { "name": "period_end", "type": "date" },
+        { "name": "priority", "type": "text" },
+        { "name": "success_criteria", "type": "text" },
+        { "name": "estimated_minutes", "type": "numeric" },
+        { "name": "revised_at", "type": "timestamptz", "default": "now()" }
+      ]
+    },
+    {
+      "name": "todos",
+      "purpose": "계획에 딸린 개별 할 일. 삭제는 소프트 삭제(is_deleted)이며, 실제 행은 남는다.",
+      "columns": [
+        { "name": "id", "type": "uuid" },
+        { "name": "plan_id", "type": "uuid", "references": "plans.id" },
+        { "name": "title", "type": "text" },
+        { "name": "content", "type": "text", "nullable": true },
+        { "name": "due_date", "type": "date", "nullable": true },
+        { "name": "priority", "type": "text" },
+        { "name": "tags", "type": "text[]", "default": "'{}'" },
+        { "name": "estimated_minutes", "type": "numeric" },
+        { "name": "status", "type": "text", "note": "'in_progress' | 'done'" },
+        { "name": "is_deleted", "type": "boolean", "default": false, "note": "소프트 삭제 플래그. 돌아보기 집계는 is_deleted=false인 행만 센다." },
+        { "name": "created_at", "type": "timestamptz" },
+        { "name": "updated_at", "type": "timestamptz" }
+      ]
+    },
+    {
+      "name": "run_logs",
+      "purpose": "할 일을 실제로 수행한 기록. 계획(plans) 값을 절대 덮어쓰지 않는 별도 테이블.",
+      "columns": [
+        { "name": "id", "type": "uuid" },
+        { "name": "todo_id", "type": "uuid", "references": "todos.id" },
+        { "name": "started_at", "type": "timestamptz" },
+        { "name": "ended_at", "type": "timestamptz" },
+        { "name": "actual_minutes", "type": "numeric", "note": "(ended_at - started_at)을 분 단위로 반올림해 앱에서 계산 후 저장" },
+        { "name": "blocked_reason", "type": "text", "nullable": true },
+        { "name": "created_at", "type": "timestamptz" }
+      ]
+    },
+    {
+      "name": "completion_events",
+      "purpose": "할 일 '완료' 이벤트 전용 테이블. todo_id에 UNIQUE 제약이 걸려 있어, 완료 버튼을 연달아 여러 번 눌러도 DB가 중복 삽입을 막는다 (앱의 상태 체크가 아니라 DB 제약이 최종 방어선).",
+      "columns": [
+        { "name": "id", "type": "uuid" },
+        { "name": "todo_id", "type": "uuid", "references": "todos.id", "constraint": "UNIQUE" },
+        { "name": "completed_at", "type": "timestamptz", "default": "now()" }
+      ],
+      "idempotency_rule": "완료 처리: INSERT (실패해도 무시, 이미 있으면 UNIQUE 위반으로 자동 차단) + todos.status='done'. 되돌리기: 해당 todo_id의 행 DELETE + todos.status='in_progress'."
+    }
+  ],
+  "aggregation_rules_for_review_screen": {
+    "plan_count": "해당 plan_id를 가진, is_deleted=false인 todos 개수",
+    "done_count": "그중 status='done'인 개수",
+    "overdue_count": "status != 'done' AND due_date < 오늘(KST) 인 개수 (완료된 항목은 지연으로 세지 않음)",
+    "blocked_count": "run_logs 중 blocked_reason이 비어있지 않은 행이 하나라도 연결된 서로 다른 todo 개수",
+    "estimated_total": "대상 todos.estimated_minutes 합",
+    "actual_total": "대상 todos에 연결된 run_logs.actual_minutes 합",
+    "diff": "actual_total - estimated_total (데이터 없으면 0)"
+  }
+}
