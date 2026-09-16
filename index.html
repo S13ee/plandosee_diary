@@ -12,13 +12,14 @@
     --cover-brown: #4A3728;
     --cover-brown-light: #5C4735;
     --paper: #FDFBF5;
+    --paper-shade: #EFE9DA;
     --rule-line: rgba(50,46,41,0.06);
     --title-red: #C6382A;
     --ink: #322E29;
     --ink-soft: #837D72;
     --accent-green: #5E7856;
     --page-w: clamp(300px, 46vw, 460px);
-    --book-h: clamp(520px, 78vh, 640px);
+    --book-h: clamp(600px, 86vh, 720px);
   }
   *{ box-sizing:border-box; }
   html,body{ margin:0; padding:0; }
@@ -129,9 +130,11 @@
   .page{
     flex: none;
     width: var(--page-w);
-    min-height: var(--book-h);
+    height: var(--book-h);
+    overflow-y: auto;
+    overflow-x: hidden;
     background: var(--paper);
-    padding: 36px 34px 40px;
+    padding: 26px 34px 46px;
     position: relative;
     background-image: repeating-linear-gradient(
       to bottom, transparent 0, transparent 30px, var(--rule-line) 31px
@@ -140,6 +143,46 @@
   }
   .page:first-child{ border-radius: 4px 0 0 4px; padding-right: 30px; }
   .page:last-child{ border-radius: 0 4px 4px 0; padding-left: 30px; }
+
+  /* ---------- 시트(페이지 넘김) ---------- */
+  .sheet{ min-height: 0; }
+  .page-num{
+    position:absolute; top: 14px; right: 20px;
+    font-size: 10.5px; color: var(--ink-soft);
+  }
+  .page-turn{
+    position:absolute;
+    bottom:0; width: 44px; height:44px;
+    cursor:pointer; z-index: 4;
+    overflow: visible;
+  }
+  .page-turn::before{
+    content:"";
+    position:absolute; inset:0;
+    transition: transform .18s ease;
+  }
+  .page-turn.next{ right:0; }
+  .page-turn.next::before{
+    background: linear-gradient(135deg, transparent 50%, rgba(74,55,40,0.16) 50.5%);
+    box-shadow: -3px -3px 8px rgba(0,0,0,0.16);
+    transform-origin: bottom right;
+  }
+  .page-turn.next:hover::before{ transform: scale(1.18); }
+  .page-turn.prev{ left:0; }
+  .page-turn.prev::before{
+    background: linear-gradient(225deg, transparent 50%, rgba(74,55,40,0.16) 50.5%);
+    box-shadow: 3px -3px 8px rgba(0,0,0,0.16);
+    transform-origin: bottom left;
+  }
+  .page-turn.prev:hover::before{ transform: scale(1.18); }
+  .page-turn-label{
+    position:absolute; bottom: 16px;
+    font-size: 10px; color: var(--ink-soft); opacity: 0.75;
+    pointer-events:none; z-index:4;
+  }
+  .page-turn-label.next{ right: 52px; }
+  .page-turn-label.prev{ left: 52px; }
+  .page-turn.hidden, .page-turn-label.hidden{ visibility:hidden; }
 
   h1.brand-mark{ margin: 0 0 4px; }
   h1.brand-mark .brand-caps{
@@ -162,9 +205,9 @@
 
   h2.section-title{
     font-family:'Alex Brush', cursive;
-    font-size: 26px;
+    font-size: 24px;
     font-weight: 400;
-    margin: 22px 0 10px;
+    margin: 16px 0 8px;
     color: var(--title-red);
   }
 
@@ -186,17 +229,21 @@
   .cal-legend .swatch{ width: 10px; height:10px; background: rgba(94,120,86,0.32); display:inline-block; }
 
   form#plan-form{ margin-top: 4px; }
-  .field-row{ margin-bottom: 16px; }
+  .field-row{ margin-bottom: 10px; }
   .field-row label{ display:block; font-size: 11.5px; font-weight: 700; color: var(--ink-soft); margin-bottom: 4px; }
   .field-row input[type="date"],
   .field-row input[type="number"],
-  .field-row textarea{
+  .field-row input[type="text"],
+  .field-row textarea,
+  #todo-form select{
+    -webkit-appearance: none; appearance: none;
     width:100%; font-family:'Noto Sans KR', sans-serif; font-size: 14px;
     padding: 4px 2px 6px; border: none; border-bottom: 1px solid rgba(50,46,41,0.18);
+    border-radius: 0;
     background: transparent; color: var(--ink);
   }
-  .field-row input:focus, .field-row textarea:focus{ outline:none; border-bottom-color: var(--accent-green); }
-  .field-row textarea{ resize: vertical; min-height: 40px; }
+  .field-row input:focus, .field-row textarea:focus, #todo-form select:focus{ outline:none; border-bottom-color: var(--accent-green); }
+  .field-row textarea{ resize: vertical; min-height: 32px; }
   .period-row{ display:flex; gap:10px; align-items:center; }
   .period-row input{ flex:1; }
   .period-row span{ color: var(--ink-soft); font-size:13px; }
@@ -209,7 +256,7 @@
   .est-row input{ width: 80px; flex: none; }
   .est-row span{ font-size:13px; color:var(--ink-soft); }
 
-  .form-actions{ display:flex; justify-content:flex-end; gap:8px; margin-top: 12px; }
+  .form-actions{ display:flex; justify-content:flex-end; gap:8px; margin-top: 8px; }
   button{ font-family:'Noto Sans KR', sans-serif; cursor:pointer; }
   .btn-save{ background: var(--accent-green); color:#fff; border:none; padding: 9px 18px; border-radius: 3px; font-size: 13px; font-weight: 700; }
   .btn-save:hover{ opacity:0.88; }
@@ -230,9 +277,83 @@
   .revisions .rev-item{ font-size: 11px; color: var(--ink-soft); padding: 4px 0; }
   .revisions .rev-empty{ font-size:11px; color:var(--ink-soft); font-style:italic; }
 
+  /* ---------- 할 일 ---------- */
+  .todo-controls{
+    display:flex; gap:8px; margin-top: 6px; flex-wrap: wrap;
+  }
+  .todo-controls input, .todo-controls select{
+    font-family:'Noto Sans KR', sans-serif; font-size: 12.5px;
+    padding: 6px 8px; border: 1px solid rgba(50,46,41,0.15);
+    border-radius: 3px; background: #fff; color: var(--ink);
+  }
+  .todo-controls input{ flex: 1 1 120px; }
+  .sort-label{ font-size: 10.5px; color: var(--ink-soft); margin-top: 5px; }
+
+  #todo-list{ margin-top: 10px; }
+  .todo-entry{
+    padding: 9px 0; border-bottom: 1px dashed rgba(50,46,41,0.14); font-size: 13px;
+    display:flex; gap: 10px; align-items:flex-start;
+  }
+  .todo-entry.done{ opacity: 0.55; }
+  .todo-entry .todo-check{
+    width: 18px; height:18px; margin-top:2px; flex:none; cursor:pointer;
+    accent-color: var(--accent-green);
+  }
+  .todo-entry .todo-body{ flex:1; min-width:0; }
+  .todo-entry .todo-title{ font-weight:700; margin-bottom:2px; }
+  .todo-entry.done .todo-title{ text-decoration: line-through; }
+  .todo-entry .todo-meta{ font-size: 11.5px; color: var(--ink-soft); line-height:1.6; }
+  .todo-entry .todo-tags span{
+    display:inline-block; background: rgba(94,120,86,0.14); color: var(--accent-green);
+    font-size: 10.5px; padding: 1px 6px; border-radius: 8px; margin-right:4px;
+  }
+  .todo-entry .todo-actions{ margin-top:5px; display:flex; gap:10px; }
+  .todo-entry .todo-actions button{
+    background:none; border:none; padding:0; font-size: 11px; color: var(--ink-soft); text-decoration: underline;
+  }
+  .todo-entry .todo-actions button:hover{ color: var(--accent-green); }
+
+  /* ---------- 실행 기록 (Do) ---------- */
+  .run-entry{ padding: 9px 0; border-bottom: 1px dashed rgba(50,46,41,0.14); font-size: 12.5px; }
+  .run-entry .run-todo{ font-weight:700; margin-bottom:2px; }
+  .run-entry .run-meta{ color: var(--ink-soft); line-height:1.6; }
+  .run-entry .run-blocked{ color: var(--title-red); margin-top:2px; }
+
+  /* ---------- 돌아보기 (See) ---------- */
+  .stat-grid{
+    display:grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    margin: 10px 0 16px;
+  }
+  .stat-box{
+    border-bottom: 1px solid rgba(50,46,41,0.12);
+    padding-bottom: 8px;
+  }
+  .stat-box .stat-label{ font-size: 10.5px; color: var(--ink-soft); }
+  .stat-box .stat-num{
+    font-size: 22px; font-weight:700; color: var(--accent-green);
+    cursor:pointer; text-decoration: underline dotted;
+  }
+  .stat-box .stat-num:hover{ color: var(--title-red); }
+  .time-compare{ font-size: 12.5px; color: var(--ink); line-height:1.7; margin-bottom: 8px; }
+  .time-compare b{ color: var(--cover-brown); }
+  .drill-banner{
+    background: rgba(94,120,86,0.12); border-radius:3px;
+    padding: 6px 10px; font-size: 11.5px; color: var(--accent-green);
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom: 8px;
+  }
+  .drill-banner button{
+    background:none; border:none; color: var(--title-red);
+    font-size: 11px; text-decoration: underline;
+  }
+
   .empty-note{ font-size: 12.5px; color: var(--ink-soft); padding: 12px 0; }
   #save-status{ font-size: 11.5px; color: var(--ink-soft); margin-top: 6px; min-height: 14px; }
   #save-status.err{ color: var(--title-red); font-weight:700; }
+  #todo-save-status{ font-size: 11.5px; color: var(--ink-soft); margin-top: 6px; min-height: 14px; }
+  #todo-save-status.err{ color: var(--title-red); font-weight:700; }
+  #run-save-status, #see-carry-status, #export-status{ font-size: 11.5px; color: var(--ink-soft); margin-top: 6px; min-height: 14px; }
+  #run-save-status.err{ color: var(--title-red); font-weight:700; }
 
   @media (max-width: 720px){
     .diary-spread{ flex-direction: column; width: var(--page-w); }
@@ -272,9 +393,15 @@
         <tbody id="cal-body"></tbody>
       </table>
       <div class="cal-legend"><span class="swatch"></span> 계획 기간</div>
+
+      <div class="page-turn prev" id="page-turn-prev"></div>
+      <div class="page-turn-label prev" id="page-turn-prev-label">이전장으로</div>
     </div>
 
     <div class="page page-right">
+      <div class="page-num" id="page-num"></div>
+
+      <div class="sheet" id="sheet-plan">
       <h2 class="section-title" style="margin-top:0;">Plan</h2>
 
       <form id="plan-form">
@@ -318,6 +445,141 @@
 
       <h2 class="section-title">Saved Plans</h2>
       <div id="plan-list"><div class="empty-note">불러오는 중...</div></div>
+      </div><!-- /sheet-plan -->
+
+      <div class="sheet" id="sheet-todo" style="display:none;">
+      <h2 class="section-title" style="margin-top:0;">Todo</h2>
+
+      <form id="todo-form">
+        <div class="field-row">
+          <label>이 할 일이 딸린 계획</label>
+          <select id="todo-plan-select" required></select>
+        </div>
+        <div class="field-row">
+          <label>제목</label>
+          <input type="text" id="todo-title" required>
+        </div>
+        <div class="field-row">
+          <label>내용</label>
+          <textarea id="todo-content" placeholder="구체적으로 뭘 할지"></textarea>
+        </div>
+        <div class="field-row">
+          <div class="period-row">
+            <div style="flex:1;">
+              <label>마감일</label>
+              <input type="date" id="todo-due">
+            </div>
+            <div style="flex:1;">
+              <label>예상 시간</label>
+              <input type="number" id="todo-estimated" min="0" placeholder="분">
+            </div>
+          </div>
+        </div>
+        <div class="field-row">
+          <label>우선순위</label>
+          <div class="priority-options">
+            <label><input type="radio" name="todo-priority" value="높음" checked><span>높음</span></label>
+            <label><input type="radio" name="todo-priority" value="중간"><span>중간</span></label>
+            <label><input type="radio" name="todo-priority" value="낮음"><span>낮음</span></label>
+          </div>
+        </div>
+        <div class="field-row">
+          <label>태그 (쉼표로 구분, 예: 근력,아침)</label>
+          <input type="text" id="todo-tags" placeholder="근력, 아침">
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" id="todo-btn-cancel">수정 취소</button>
+          <button type="submit" class="btn-save" id="todo-btn-save">할 일 저장</button>
+        </div>
+        <div id="todo-save-status"></div>
+      </form>
+
+      <div class="todo-controls">
+        <input type="text" id="todo-search" placeholder="검색 (제목·내용)">
+        <select id="todo-filter-status">
+          <option value="all">전체</option>
+          <option value="in_progress">진행중</option>
+          <option value="done">완료</option>
+        </select>
+        <select id="todo-sort">
+          <option value="due_asc">마감일 빠른순</option>
+          <option value="priority">우선순위순 (높음→낮음)</option>
+          <option value="estimated_desc">예상시간 많은순</option>
+        </select>
+      </div>
+      <div class="sort-label" id="todo-sort-label"></div>
+
+      <div class="drill-banner" id="drill-banner" style="display:none;">
+        <span id="drill-banner-text"></span>
+        <button type="button" id="drill-clear">필터 초기화</button>
+      </div>
+
+      <div id="todo-list"><div class="empty-note">불러오는 중...</div></div>
+      </div><!-- /sheet-todo -->
+
+      <div class="sheet" id="sheet-do" style="display:none;">
+      <h2 class="section-title" style="margin-top:0;">Do</h2>
+
+      <form id="run-form">
+        <div class="field-row">
+          <label>어느 할 일을 했나요</label>
+          <select id="run-todo-select" required></select>
+        </div>
+        <div class="field-row">
+          <div class="period-row">
+            <div style="flex:1;">
+              <label>시작 시각</label>
+              <input type="datetime-local" id="run-start" required>
+            </div>
+            <div style="flex:1;">
+              <label>끝난 시각</label>
+              <input type="datetime-local" id="run-end" required>
+            </div>
+          </div>
+        </div>
+        <div class="field-row">
+          <label>막혔던 이유 (없으면 비워두세요)</label>
+          <input type="text" id="run-blocked" placeholder="예: 비가 와서 못 나감">
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-save" id="run-btn-save">실행 기록 저장</button>
+        </div>
+        <div id="run-save-status"></div>
+      </form>
+
+      <h2 class="section-title">Log</h2>
+      <div id="run-list"><div class="empty-note">불러오는 중...</div></div>
+      </div><!-- /sheet-do -->
+
+      <div class="sheet" id="sheet-see" style="display:none;">
+      <h2 class="section-title" style="margin-top:0;">See</h2>
+
+      <div class="field-row">
+        <label>어느 계획을 돌아볼까요</label>
+        <select id="see-plan-select"></select>
+      </div>
+
+      <div id="see-stats"><div class="empty-note">불러오는 중...</div></div>
+
+      <h2 class="section-title">Next</h2>
+      <div class="field-row">
+        <label>이번에 돌아보고 고칠 점 한 줄</label>
+        <textarea id="see-note" placeholder="예: 저녁 약속이 잦아서 오전 운동으로 바꾸자"></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn-save" id="see-carry-btn">다음 계획에 반영하기</button>
+      </div>
+      <div id="see-carry-status"></div>
+
+      <h2 class="section-title">Export</h2>
+      <div class="form-actions" style="justify-content:flex-start;">
+        <button type="button" class="btn-save" id="export-btn">전체 자료 내보내기 (JSON)</button>
+      </div>
+      <div id="export-status"></div>
+      </div><!-- /sheet-see -->
+
+      <div class="page-turn next" id="page-turn-next"></div>
+      <div class="page-turn-label next" id="page-turn-next-label">다음장으로</div>
     </div>
   </div>
 </div>
@@ -345,6 +607,39 @@
   closeTab.addEventListener('click', function(){
     appRoot.classList.remove('open');
     coverScreen.style.display = 'flex';
+  });
+
+  /* ---------- 시트(페이지 넘김) ---------- */
+  var SHEETS = ['sheet-plan', 'sheet-todo', 'sheet-do', 'sheet-see'];
+  var SHEET_LABELS = {
+    'sheet-plan':'1 / 4 · Plan',
+    'sheet-todo':'2 / 4 · Todo',
+    'sheet-do':'3 / 4 · Do',
+    'sheet-see':'4 / 4 · See'
+  };
+  var currentSheetIndex = 0;
+  var pageNumEl = document.getElementById('page-num');
+  var turnPrevEl = document.getElementById('page-turn-prev');
+  var turnNextEl = document.getElementById('page-turn-next');
+  var turnPrevLabelEl = document.getElementById('page-turn-prev-label');
+  var turnNextLabelEl = document.getElementById('page-turn-next-label');
+
+  function showSheet(idx){
+    currentSheetIndex = idx;
+    SHEETS.forEach(function(id, i){
+      document.getElementById(id).style.display = (i === idx) ? '' : 'none';
+    });
+    pageNumEl.textContent = SHEET_LABELS[SHEETS[idx]];
+    turnPrevEl.classList.toggle('hidden', idx === 0);
+    turnPrevLabelEl.classList.toggle('hidden', idx === 0);
+    turnNextEl.classList.toggle('hidden', idx === SHEETS.length - 1);
+    turnNextLabelEl.classList.toggle('hidden', idx === SHEETS.length - 1);
+  }
+  turnNextEl.addEventListener('click', function(){
+    if(currentSheetIndex < SHEETS.length - 1) showSheet(currentSheetIndex + 1);
+  });
+  turnPrevEl.addEventListener('click', function(){
+    if(currentSheetIndex > 0) showSheet(currentSheetIndex - 1);
   });
 
   var form = document.getElementById('plan-form');
@@ -565,6 +860,8 @@
     currentPlans = res.data || [];
     renderPlanList(currentPlans);
     renderCalendar();
+    populatePlanSelect();
+    populateSeePlanSelect();
   }
 
   async function seedExampleIfEmpty(){
@@ -580,13 +877,560 @@
     });
   }
 
+  /* ================= 할 일 (카드2) ================= */
+  var todoForm = document.getElementById('todo-form');
+  var todoPlanSelect = document.getElementById('todo-plan-select');
+  var todoTitle = document.getElementById('todo-title');
+  var todoContent = document.getElementById('todo-content');
+  var todoDue = document.getElementById('todo-due');
+  var todoEstimated = document.getElementById('todo-estimated');
+  var todoTags = document.getElementById('todo-tags');
+  var todoBtnSave = document.getElementById('todo-btn-save');
+  var todoBtnCancel = document.getElementById('todo-btn-cancel');
+  var todoSaveStatus = document.getElementById('todo-save-status');
+  var todoListEl = document.getElementById('todo-list');
+  var todoSearchEl = document.getElementById('todo-search');
+  var todoFilterEl = document.getElementById('todo-filter-status');
+  var todoSortEl = document.getElementById('todo-sort');
+  var todoSortLabelEl = document.getElementById('todo-sort-label');
+
+  var editingTodoId = null;
+  var currentTodos = [];
+
+  var SORT_LABELS = {
+    due_asc: '정렬 기준: 마감일이 빠른 순',
+    priority: '정렬 기준: 우선순위 (높음 → 낮음)',
+    estimated_desc: '정렬 기준: 예상 시간이 많은 순'
+  };
+  var PRIORITY_RANK = { '높음':0, '중간':1, '낮음':2 };
+
+  function populatePlanSelect(){
+    var prev = todoPlanSelect.value;
+    todoPlanSelect.innerHTML = '';
+    currentPlans.forEach(function(p){
+      var opt = document.createElement('option');
+      opt.value = p.id;
+      opt.textContent = p.period_start + '~' + p.period_end + ' (' + p.success_criteria.slice(0,16) + (p.success_criteria.length>16?'...':'') + ')';
+      todoPlanSelect.appendChild(opt);
+    });
+    if(prev && currentPlans.some(function(p){ return p.id === prev; })){
+      todoPlanSelect.value = prev;
+    }
+  }
+
+  function getTodoPriorityValue(){
+    var c = todoForm.querySelector('input[name="todo-priority"]:checked');
+    return c ? c.value : '중간';
+  }
+  function setTodoPriorityValue(v){
+    todoForm.querySelectorAll('input[name="todo-priority"]').forEach(function(r){ r.checked = (r.value === v); });
+  }
+  function setTodoStatus(msg, isErr){
+    todoSaveStatus.textContent = msg;
+    todoSaveStatus.className = isErr ? 'err' : '';
+  }
+  function resetTodoForm(){
+    editingTodoId = null;
+    todoBtnSave.textContent = '할 일 저장';
+    todoBtnCancel.classList.remove('show');
+    todoForm.reset();
+    setTodoPriorityValue('중간');
+    populatePlanSelect();
+  }
+  function loadTodoIntoForm(t){
+    editingTodoId = t.id;
+    todoPlanSelect.value = t.plan_id;
+    todoTitle.value = t.title;
+    todoContent.value = t.content || '';
+    todoDue.value = t.due_date || '';
+    todoEstimated.value = t.estimated_minutes;
+    setTodoPriorityValue(t.priority || '중간');
+    todoTags.value = (t.tags || []).join(', ');
+    todoBtnSave.textContent = '수정 내용 저장';
+    todoBtnCancel.classList.add('show');
+  }
+  todoBtnCancel.addEventListener('click', resetTodoForm);
+
+  function parseTags(str){
+    return str.split(',').map(function(s){ return s.trim(); }).filter(function(s){ return s.length > 0; });
+  }
+
+  todoForm.addEventListener('submit', async function(e){
+    e.preventDefault();
+    if(!todoPlanSelect.value){
+      setTodoStatus('✕ 먼저 계획을 하나 이상 저장해주세요', true);
+      return;
+    }
+    var payload = {
+      plan_id: todoPlanSelect.value,
+      title: todoTitle.value,
+      content: todoContent.value,
+      due_date: todoDue.value || null,
+      priority: getTodoPriorityValue(),
+      tags: parseTags(todoTags.value),
+      estimated_minutes: Number(todoEstimated.value || 0)
+    };
+    todoBtnSave.disabled = true;
+    setTodoStatus('저장하는 중...');
+
+    var result = editingTodoId
+      ? await sb.from('todos').update(payload).eq('id', editingTodoId)
+      : await sb.from('todos').insert(payload);
+
+    todoBtnSave.disabled = false;
+    if(result.error){
+      setTodoStatus('✕ 저장 실패: ' + result.error.message, true);
+      return;
+    }
+    setTodoStatus(editingTodoId ? '수정됐습니다' : '새 할 일이 저장됐습니다');
+    resetTodoForm();
+    await loadTodosAndRender();
+  });
+
+  async function toggleTodoComplete(t){
+    if(t.status === 'done'){
+      // 되돌리기: 완료 이벤트 삭제 후 상태 되돌림
+      await sb.from('completion_events').delete().eq('todo_id', t.id);
+      await sb.from('todos').update({ status:'in_progress' }).eq('id', t.id);
+    } else {
+      // 완료: 이벤트가 이미 있으면(연타) unique 제약이 막아주므로 에러는 무시
+      await sb.from('completion_events').insert({ todo_id: t.id });
+      await sb.from('todos').update({ status:'done' }).eq('id', t.id);
+    }
+    await loadTodosAndRender();
+  }
+
+  async function deleteTodo(t){
+    await sb.from('todos').update({ is_deleted: true }).eq('id', t.id);
+    await loadTodosAndRender();
+  }
+
+  function getFilteredSortedTodos(){
+    var list;
+    if(drillFilter){
+      var today = seoulTodayISO();
+      var blockedIds = blockedTodoIdSet();
+      list = currentTodos.filter(function(t){
+        if(t.plan_id !== drillFilter.planId) return false;
+        if(drillFilter.mode === 'done') return t.status === 'done';
+        if(drillFilter.mode === 'overdue') return t.status !== 'done' && t.due_date && t.due_date < today;
+        if(drillFilter.mode === 'blocked') return blockedIds.has(t.id);
+        return true; // 'all'
+      });
+    } else {
+      var q = todoSearchEl.value.trim().toLowerCase();
+      var statusFilter = todoFilterEl.value;
+      list = currentTodos.filter(function(t){
+        if(q !== ''){
+          var hay = (t.title + ' ' + (t.content||'')).toLowerCase();
+          if(hay.indexOf(q) === -1) return false;
+        }
+        if(statusFilter !== 'all' && t.status !== statusFilter) return false;
+        return true;
+      });
+    }
+    var sortKey = todoSortEl.value;
+    list.sort(function(a,b){
+      if(sortKey === 'due_asc'){
+        var da = a.due_date || '9999-99-99', db = b.due_date || '9999-99-99';
+        if(da !== db) return da < db ? -1 : 1;
+        return a.id < b.id ? -1 : 1;
+      }
+      if(sortKey === 'priority'){
+        var ra = PRIORITY_RANK[a.priority] ?? 1, rb = PRIORITY_RANK[b.priority] ?? 1;
+        if(ra !== rb) return ra - rb;
+        return a.id < b.id ? -1 : 1;
+      }
+      if(sortKey === 'estimated_desc'){
+        if(a.estimated_minutes !== b.estimated_minutes) return b.estimated_minutes - a.estimated_minutes;
+        return a.id < b.id ? -1 : 1;
+      }
+      return 0;
+    });
+    return list;
+  }
+
+  function renderTodoList(){
+    var drillBannerEl = document.getElementById('drill-banner');
+    var drillBannerTextEl = document.getElementById('drill-banner-text');
+    if(drillFilter){
+      var modeText = { all:'전체', done:'완료', overdue:'지연', blocked:'막힘' }[drillFilter.mode] || drillFilter.mode;
+      drillBannerTextEl.textContent = '돌아보기에서 이동함 · "' + modeText + '" 조건의 할 일만 표시 중';
+      drillBannerEl.style.display = 'flex';
+    } else {
+      drillBannerEl.style.display = 'none';
+    }
+    todoSortLabelEl.textContent = SORT_LABELS[todoSortEl.value] || '';
+    var list = getFilteredSortedTodos();
+    if(currentTodos.length === 0){
+      todoListEl.innerHTML = '<div class="empty-note">할 일이 없습니다.</div>';
+      return;
+    }
+    if(list.length === 0){
+      todoListEl.innerHTML = '<div class="empty-note">조건에 맞는 할 일이 없습니다.</div>';
+      return;
+    }
+    todoListEl.innerHTML = '';
+    list.forEach(function(t){
+      var entry = document.createElement('div');
+      entry.className = 'todo-entry' + (t.status === 'done' ? ' done' : '');
+
+      var check = document.createElement('input');
+      check.type = 'checkbox';
+      check.className = 'todo-check';
+      check.checked = (t.status === 'done');
+      check.addEventListener('change', function(){ toggleTodoComplete(t); });
+
+      var body = document.createElement('div');
+      body.className = 'todo-body';
+
+      var title = document.createElement('div');
+      title.className = 'todo-title';
+      title.textContent = t.title;
+
+      var meta = document.createElement('div');
+      meta.className = 'todo-meta';
+      var metaBits = [];
+      if(t.due_date) metaBits.push('마감 ' + t.due_date);
+      metaBits.push('우선순위 ' + t.priority);
+      metaBits.push(t.estimated_minutes + '분');
+      meta.textContent = metaBits.join(' · ');
+
+      var tagsEl = document.createElement('div');
+      tagsEl.className = 'todo-tags';
+      (t.tags || []).forEach(function(tag){
+        var s = document.createElement('span');
+        s.textContent = '#' + tag;
+        tagsEl.appendChild(s);
+      });
+
+      var actions = document.createElement('div');
+      actions.className = 'todo-actions';
+      var editBtn = document.createElement('button');
+      editBtn.type = 'button'; editBtn.textContent = '수정';
+      editBtn.addEventListener('click', function(){ loadTodoIntoForm(t); });
+      var delBtn = document.createElement('button');
+      delBtn.type = 'button'; delBtn.textContent = '삭제';
+      delBtn.addEventListener('click', function(){
+        if(confirm('이 할 일을 지울까요?')) deleteTodo(t);
+      });
+      actions.appendChild(editBtn);
+      actions.appendChild(delBtn);
+
+      body.appendChild(title);
+      body.appendChild(meta);
+      if((t.tags||[]).length) body.appendChild(tagsEl);
+      body.appendChild(actions);
+
+      entry.appendChild(check);
+      entry.appendChild(body);
+      todoListEl.appendChild(entry);
+    });
+  }
+
+  todoSearchEl.addEventListener('input', renderTodoList);
+  todoFilterEl.addEventListener('change', renderTodoList);
+  todoSortEl.addEventListener('change', renderTodoList);
+
+  async function loadTodosAndRender(){
+    todoListEl.innerHTML = '<div class="empty-note">불러오는 중...</div>';
+    var res = await sb.from('todos').select('*').eq('is_deleted', false).order('created_at', { ascending:false });
+    if(res.error){
+      todoListEl.innerHTML = '<div class="empty-note">✕ 목록을 불러오지 못했습니다: ' + res.error.message + '</div>';
+      currentTodos = [];
+      return;
+    }
+    currentTodos = res.data || [];
+    renderTodoList();
+    if(typeof renderSeeStats === 'function') renderSeeStats();
+  }
+
+  async function seedTodosIfEmpty(){
+    var res = await sb.from('todos').select('id', { count:'exact', head:true });
+    if(res.error || (res.count && res.count > 0)) return;
+    var planRes = await sb.from('plans').select('id').order('created_at', { ascending:false }).limit(1);
+    if(planRes.error || !planRes.data || planRes.data.length === 0) return;
+    var planId = planRes.data[0].id;
+
+    var seeds = [
+      { title:'웨이트 - 상체', content:'벤치프레스, 랫풀다운, 숄더프레스', due_date: todayISO(2), priority:'높음', tags:['근력'], estimated_minutes:60 },
+      { title:'웨이트 - 하체', content:'스쿼트, 레그프레스, 런지', due_date: todayISO(4), priority:'높음', tags:['근력'], estimated_minutes:60 },
+      { title:'유산소 - 러닝 5km', content:'페이스 6분/km 목표', due_date: todayISO(1), priority:'중간', tags:['유산소'], estimated_minutes:30 },
+      { title:'유산소 - 사이클', content:'실내 자전거 30분', due_date: todayISO(3), priority:'중간', tags:['유산소'], estimated_minutes:30 },
+      { title:'스트레칭 - 전신', content:'운동 전후 스트레칭', due_date: todayISO(5), priority:'낮음', tags:['회복'], estimated_minutes:20 }
+    ];
+    for(var i=0;i<seeds.length;i++){
+      var s = seeds[i];
+      s.plan_id = planId;
+      await sb.from('todos').insert(s);
+    }
+  }
+
+  /* ================= 실행 기록 (카드3, Do) ================= */
+  var runForm = document.getElementById('run-form');
+  var runTodoSelect = document.getElementById('run-todo-select');
+  var runStart = document.getElementById('run-start');
+  var runEnd = document.getElementById('run-end');
+  var runBlocked = document.getElementById('run-blocked');
+  var runSaveStatus = document.getElementById('run-save-status');
+  var runListEl = document.getElementById('run-list');
+  var currentRunLogs = [];
+
+  function todoTitleById(id){
+    var t = currentTodos.find(function(x){ return x.id === id; });
+    return t ? t.title : '(삭제된 할 일)';
+  }
+
+  function populateRunTodoSelect(){
+    var prev = runTodoSelect.value;
+    runTodoSelect.innerHTML = '';
+    currentTodos.forEach(function(t){
+      var opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = t.title + (t.status==='done' ? ' (완료)' : '');
+      runTodoSelect.appendChild(opt);
+    });
+    if(prev && currentTodos.some(function(t){ return t.id === prev; })){
+      runTodoSelect.value = prev;
+    }
+  }
+
+  function setRunStatus(msg, isErr){
+    runSaveStatus.textContent = msg;
+    runSaveStatus.className = isErr ? 'err' : '';
+  }
+
+  runForm.addEventListener('submit', async function(e){
+    e.preventDefault();
+    if(!runTodoSelect.value){
+      setRunStatus('✕ 먼저 할 일을 하나 이상 만들어주세요', true);
+      return;
+    }
+    var start = new Date(runStart.value);
+    var end = new Date(runEnd.value);
+    if(!(end > start)){
+      setRunStatus('✕ 끝난 시각이 시작 시각보다 늦어야 합니다', true);
+      return;
+    }
+    var actualMinutes = Math.round((end - start) / 60000);
+    var payload = {
+      todo_id: runTodoSelect.value,
+      started_at: start.toISOString(),
+      ended_at: end.toISOString(),
+      actual_minutes: actualMinutes,
+      blocked_reason: runBlocked.value.trim() || null
+    };
+    document.getElementById('run-btn-save').disabled = true;
+    setRunStatus('저장하는 중...');
+    var result = await sb.from('run_logs').insert(payload);
+    document.getElementById('run-btn-save').disabled = false;
+    if(result.error){
+      setRunStatus('✕ 저장 실패: ' + result.error.message, true);
+      return;
+    }
+    setRunStatus('실행 기록이 저장됐습니다 (' + actualMinutes + '분)');
+    runForm.reset();
+    await loadRunLogsAndRender();
+    renderSeeStats();
+  });
+
+  function renderRunList(){
+    if(currentRunLogs.length === 0){
+      runListEl.innerHTML = '<div class="empty-note">실행 기록이 없습니다.</div>';
+      return;
+    }
+    runListEl.innerHTML = '';
+    currentRunLogs.forEach(function(r){
+      var entry = document.createElement('div');
+      entry.className = 'run-entry';
+      var title = document.createElement('div');
+      title.className = 'run-todo';
+      title.textContent = todoTitleById(r.todo_id);
+      var meta = document.createElement('div');
+      meta.className = 'run-meta';
+      var s = new Date(r.started_at).toLocaleString('ko-KR');
+      var e = new Date(r.ended_at).toLocaleString('ko-KR');
+      meta.textContent = s + ' ~ ' + e + ' · 실제 ' + r.actual_minutes + '분';
+      entry.appendChild(title);
+      entry.appendChild(meta);
+      if(r.blocked_reason){
+        var blocked = document.createElement('div');
+        blocked.className = 'run-blocked';
+        blocked.textContent = '막힘: ' + r.blocked_reason;
+        entry.appendChild(blocked);
+      }
+      runListEl.appendChild(entry);
+    });
+  }
+
+  async function loadRunLogsAndRender(){
+    runListEl.innerHTML = '<div class="empty-note">불러오는 중...</div>';
+    var res = await sb.from('run_logs').select('*').order('started_at', { ascending:false });
+    if(res.error){
+      runListEl.innerHTML = '<div class="empty-note">✕ 목록을 불러오지 못했습니다: ' + res.error.message + '</div>';
+      currentRunLogs = [];
+      return;
+    }
+    currentRunLogs = res.data || [];
+    populateRunTodoSelect();
+    renderRunList();
+  }
+
+  function blockedTodoIdSet(){
+    var s = new Set();
+    currentRunLogs.forEach(function(r){
+      if(r.blocked_reason && r.blocked_reason.trim() !== '') s.add(r.todo_id);
+    });
+    return s;
+  }
+
+  function seoulTodayISO(){
+    var now = new Date();
+    var utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
+    var seoul = new Date(utcMs + 9 * 3600000);
+    return seoul.getFullYear() + '-' + pad2(seoul.getMonth()+1) + '-' + pad2(seoul.getDate());
+  }
+
+  /* ================= 돌아보기 (카드4, See) ================= */
+  var seePlanSelect = document.getElementById('see-plan-select');
+  var seeStatsEl = document.getElementById('see-stats');
+  var seeNote = document.getElementById('see-note');
+  var seeCarryBtn = document.getElementById('see-carry-btn');
+  var seeCarryStatus = document.getElementById('see-carry-status');
+  var drillFilter = null;
+
+  function populateSeePlanSelect(){
+    var prev = seePlanSelect.value;
+    seePlanSelect.innerHTML = '';
+    currentPlans.forEach(function(p){
+      var opt = document.createElement('option');
+      opt.value = p.id;
+      opt.textContent = p.period_start + '~' + p.period_end + ' (' + p.success_criteria.slice(0,14) + (p.success_criteria.length>14?'...':'') + ')';
+      seePlanSelect.appendChild(opt);
+    });
+    if(prev && currentPlans.some(function(p){ return p.id === prev; })){
+      seePlanSelect.value = prev;
+    }
+  }
+  seePlanSelect.addEventListener('change', renderSeeStats);
+
+  function jumpToTodos(planId, mode){
+    drillFilter = { planId: planId, mode: mode };
+    var idx = SHEETS.indexOf('sheet-todo');
+    showSheet(idx);
+    renderTodoList();
+  }
+
+  document.getElementById('drill-clear').addEventListener('click', function(){
+    drillFilter = null;
+    renderTodoList();
+  });
+
+  function renderSeeStats(){
+    if(!seePlanSelect.value){
+      seeStatsEl.innerHTML = '<div class="empty-note">먼저 계획을 하나 저장해주세요.</div>';
+      return;
+    }
+    var planId = seePlanSelect.value;
+    var todosForPlan = currentTodos.filter(function(t){ return t.plan_id === planId; });
+    var today = seoulTodayISO();
+    var blockedIds = blockedTodoIdSet();
+
+    var planCount = todosForPlan.length;
+    var doneCount = todosForPlan.filter(function(t){ return t.status === 'done'; }).length;
+    var overdueCount = todosForPlan.filter(function(t){
+      return t.status !== 'done' && t.due_date && t.due_date < today;
+    }).length;
+    var blockedCount = todosForPlan.filter(function(t){ return blockedIds.has(t.id); }).length;
+
+    var estSum = todosForPlan.reduce(function(s,t){ return s + (t.estimated_minutes||0); }, 0);
+    var planTodoIds = new Set(todosForPlan.map(function(t){ return t.id; }));
+    var actualSum = currentRunLogs
+      .filter(function(r){ return planTodoIds.has(r.todo_id); })
+      .reduce(function(s,r){ return s + (r.actual_minutes||0); }, 0);
+    var diff = actualSum - estSum;
+
+    seeStatsEl.innerHTML =
+      '<div class="stat-grid">' +
+        '<div class="stat-box"><div class="stat-label">계획 수 (지우지 않은 할 일)</div><div class="stat-num" id="stat-plan">'+planCount+'</div></div>' +
+        '<div class="stat-box"><div class="stat-label">완료 수</div><div class="stat-num" id="stat-done">'+doneCount+'</div></div>' +
+        '<div class="stat-box"><div class="stat-label">지연 수</div><div class="stat-num" id="stat-overdue">'+overdueCount+'</div></div>' +
+        '<div class="stat-box"><div class="stat-label">막힘 수</div><div class="stat-num" id="stat-blocked">'+blockedCount+'</div></div>' +
+      '</div>' +
+      '<div class="time-compare">' +
+        '예상 시간 합계: <b>'+estSum+'분</b><br>' +
+        '실제 시간 합계: <b>'+actualSum+'분</b><br>' +
+        '차이(실제-예상): <b>'+(diff>=0?'+':'')+diff+'분</b>' +
+      '</div>';
+
+    document.getElementById('stat-plan').addEventListener('click', function(){ jumpToTodos(planId, 'all'); });
+    document.getElementById('stat-done').addEventListener('click', function(){ jumpToTodos(planId, 'done'); });
+    document.getElementById('stat-overdue').addEventListener('click', function(){ jumpToTodos(planId, 'overdue'); });
+    document.getElementById('stat-blocked').addEventListener('click', function(){ jumpToTodos(planId, 'blocked'); });
+  }
+
+  seeCarryBtn.addEventListener('click', function(){
+    var note = seeNote.value.trim();
+    if(!note){
+      seeCarryStatus.textContent = '✕ 먼저 고칠 점을 한 줄 적어주세요';
+      seeCarryStatus.className = 'err';
+      return;
+    }
+    resetFormToNew();
+    successCriteria.value = '[돌아보기 반영] ' + note;
+    seeCarryStatus.textContent = '';
+    showSheet(SHEETS.indexOf('sheet-plan'));
+  });
+
+  /* ================= 전체 자료 내보내기 (카드5) ================= */
+  var exportBtn = document.getElementById('export-btn');
+  var exportStatus = document.getElementById('export-status');
+
+  exportBtn.addEventListener('click', async function(){
+    exportBtn.disabled = true;
+    exportStatus.textContent = '자료를 모으는 중...';
+    try{
+      var revRes = await sb.from('plan_revisions').select('*').order('revised_at', { ascending:false });
+      var payload = {
+        exported_at: new Date().toISOString(),
+        schema_version: 'pds-schema-v2',
+        plans: currentPlans,
+        plan_revisions: revRes.data || [],
+        todos: currentTodos,
+        run_logs: currentRunLogs
+      };
+      var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'plandosee-export-' + seoulTodayISO() + '.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      exportStatus.textContent = '내보내기 완료';
+    } catch(err){
+      exportStatus.textContent = '✕ 내보내기 실패: ' + err.message;
+    }
+    exportBtn.disabled = false;
+  });
+
   function startApp(){
     var now = new Date();
     calYear = now.getFullYear();
     calMonth = now.getMonth();
     periodStart.value = todayISO(0);
     periodEnd.value = todayISO(27);
-    seedExampleIfEmpty().then(loadPlansAndRender);
+    showSheet(0);
+    seedExampleIfEmpty()
+      .then(loadPlansAndRender)
+      .then(seedTodosIfEmpty)
+      .then(loadTodosAndRender)
+      .then(loadRunLogsAndRender)
+      .then(function(){
+        populateSeePlanSelect();
+        renderSeeStats();
+      });
   }
 
 })();
