@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>플랜두씨 다이어리</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Alex+Brush&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-green: #8C9C85;
+    --cover-brown: #4A3728;
+    --cover-brown-light: #5C4735;
+    --paper: #FDFBF5;
+    --rule-line: rgba(50,46,41,0.06);
+    --title-red: #C6382A;
+    --ink: #322E29;
+    --ink-soft: #837D72;
+    --accent-green: #5E7856;
+    --page-w: clamp(300px, 46vw, 460px);
+    --book-h: clamp(520px, 78vh, 640px);
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg-green);
+    font-family: 'Noto Sans KR', sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding: 40px 16px;
+  }
+
+  .title-font{ font-family: 'Alex Brush', cursive; }
+
+  /* ---------- 닫힌 표지 ---------- */
+  #cover-screen{
+    width: var(--page-w);
+    height: var(--book-h);
+    background: linear-gradient(155deg, var(--cover-brown-light), var(--cover-brown) 60%);
+    border-radius: 4px;
+    box-shadow: 0 18px 44px rgba(0,0,0,0.35), inset -6px 0 0 rgba(0,0,0,0.15);
+    position: relative;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding: 30px;
+    overflow:hidden;
+  }
+  #cover-screen .brand-caps{
+    font-family: 'Anton', sans-serif;
+    font-size: 17px;
+    letter-spacing: 3px;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.35);
+  }
+  #cover-screen .brand-script{
+    font-family: 'Alex Brush', cursive;
+    font-size: 64px;
+    line-height: 1;
+    color: #fff;
+    margin-top: 2px;
+    text-shadow: 0 3px 6px rgba(0,0,0,0.35);
+  }
+
+  .page-fold{
+    position:absolute;
+    right:0; bottom:0;
+    width: 56px; height:56px;
+    cursor:pointer;
+    z-index:3;
+  }
+  .page-fold::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background: linear-gradient(135deg, transparent 50%, var(--paper) 50.5%);
+    box-shadow: -4px -4px 10px rgba(0,0,0,0.28);
+    transition: width 0.18s ease, height 0.18s ease;
+  }
+  .page-fold:hover::before{ width:66px; height:66px; }
+
+  #app-root{ display:none; width:100%; }
+  #app-root.open{ display:flex; justify-content:center; }
+
+  .close-tab{
+    position:absolute;
+    top: -14px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--cover-brown);
+    color: var(--paper);
+    font-size: 11px;
+    padding: 5px 14px;
+    border-radius: 0 0 6px 6px;
+    cursor:pointer;
+    z-index: 4;
+  }
+
+  .diary-spread{
+    width: calc(var(--page-w) * 2);
+    max-width: 100%;
+    display:flex;
+    position:relative;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.3);
+    border-radius: 4px;
+  }
+
+  /* 중앙 제본선 - 은은한 명암만, 스프링 그래픽 없음 */
+  .spine{
+    position:absolute;
+    left:50%; top:0; bottom:0;
+    width: 2px;
+    transform: translateX(-50%);
+    z-index: 2;
+    pointer-events:none;
+  }
+  .spine::before, .spine::after{
+    content:"";
+    position:absolute; top:0; bottom:0;
+    width: 34px;
+  }
+  .spine::before{ left:-34px; background: linear-gradient(to right, transparent, rgba(0,0,0,0.07)); }
+  .spine::after{ right:-34px; background: linear-gradient(to left, transparent, rgba(0,0,0,0.07)); }
+
+  .page{
+    flex: none;
+    width: var(--page-w);
+    min-height: var(--book-h);
+    background: var(--paper);
+    padding: 36px 34px 40px;
+    position: relative;
+    background-image: repeating-linear-gradient(
+      to bottom, transparent 0, transparent 30px, var(--rule-line) 31px
+    );
+    background-position: 0 108px;
+  }
+  .page:first-child{ border-radius: 4px 0 0 4px; padding-right: 30px; }
+  .page:last-child{ border-radius: 0 4px 4px 0; padding-left: 30px; }
+
+  h1.brand-mark{ margin: 0 0 4px; }
+  h1.brand-mark .brand-caps{
+    display:block;
+    font-family:'Anton', sans-serif;
+    font-size: 13px;
+    letter-spacing: 2.5px;
+    color: var(--title-red);
+  }
+  h1.brand-mark .brand-script{
+    display:block;
+    font-family:'Alex Brush', cursive;
+    font-size: 34px;
+    line-height: 1;
+    color: var(--title-red);
+  }
+  .subhead{ font-size: 12.5px; color: var(--ink-soft); margin: 6px 0 0; font-weight: 500; }
+  .tagline{ font-size: 13.5px; color: var(--accent-green); margin: 10px 0 0; font-weight: 700; line-height: 1.5; }
+  .notice{ margin-top: 10px; font-size: 10.5px; color: var(--ink-soft); line-height: 1.6; opacity: 0.85; }
+
+  h2.section-title{
+    font-family:'Alex Brush', cursive;
+    font-size: 26px;
+    font-weight: 400;
+    margin: 22px 0 10px;
+    color: var(--title-red);
+  }
+
+  .cal-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 8px; }
+  .cal-head .cal-title{ font-size: 14px; font-weight: 700; color: var(--ink); }
+  .cal-head button{ background:none; border:none; color: var(--accent-green); font-size: 15px; cursor:pointer; padding: 2px 8px; font-weight:700; }
+  .cal-head button:hover{ color: var(--cover-brown); }
+
+  table.cal-grid{ width:100%; border-collapse: collapse; font-size: 12px; }
+  table.cal-grid th{ font-weight: 500; color: var(--ink-soft); padding: 4px 0; font-size: 11px; }
+  table.cal-grid td{ text-align:center; padding: 6px 0; color: var(--ink); position:relative; }
+  table.cal-grid td.blank{ color: transparent; }
+  table.cal-grid td.in-plan{ background: rgba(94,120,86,0.16); }
+  table.cal-grid td.today span{
+    display:inline-block; width: 20px; height:20px; line-height:20px;
+    border-radius:50%; border: 1.4px solid var(--title-red); color: var(--title-red); font-weight:700;
+  }
+  .cal-legend{ margin-top: 10px; font-size: 11px; color: var(--ink-soft); display:flex; align-items:center; gap: 6px; }
+  .cal-legend .swatch{ width: 10px; height:10px; background: rgba(94,120,86,0.32); display:inline-block; }
+
+  form#plan-form{ margin-top: 4px; }
+  .field-row{ margin-bottom: 16px; }
+  .field-row label{ display:block; font-size: 11.5px; font-weight: 700; color: var(--ink-soft); margin-bottom: 4px; }
+  .field-row input[type="date"],
+  .field-row input[type="number"],
+  .field-row textarea{
+    width:100%; font-family:'Noto Sans KR', sans-serif; font-size: 14px;
+    padding: 4px 2px 6px; border: none; border-bottom: 1px solid rgba(50,46,41,0.18);
+    background: transparent; color: var(--ink);
+  }
+  .field-row input:focus, .field-row textarea:focus{ outline:none; border-bottom-color: var(--accent-green); }
+  .field-row textarea{ resize: vertical; min-height: 40px; }
+  .period-row{ display:flex; gap:10px; align-items:center; }
+  .period-row input{ flex:1; }
+  .period-row span{ color: var(--ink-soft); font-size:13px; }
+
+  .priority-options{ display:flex; gap: 18px; }
+  .priority-options label{ display:flex; align-items:center; gap:6px; font-size: 13px; color: var(--ink-soft); cursor:pointer; }
+  .priority-options input:checked + span{ color: var(--accent-green); font-weight:700; }
+
+  .est-row{ display:flex; align-items:baseline; gap:8px; }
+  .est-row input{ width: 80px; flex: none; }
+  .est-row span{ font-size:13px; color:var(--ink-soft); }
+
+  .form-actions{ display:flex; justify-content:flex-end; gap:8px; margin-top: 12px; }
+  button{ font-family:'Noto Sans KR', sans-serif; cursor:pointer; }
+  .btn-save{ background: var(--accent-green); color:#fff; border:none; padding: 9px 18px; border-radius: 3px; font-size: 13px; font-weight: 700; }
+  .btn-save:hover{ opacity:0.88; }
+  .btn-cancel{ background:none; border:none; color: var(--ink-soft); font-size: 12.5px; text-decoration: underline; display:none; }
+  .btn-cancel.show{ display:inline-block; }
+
+  #plan-list{ margin-top: 10px; }
+  .plan-entry{ padding: 10px 0; border-bottom: 1px dashed rgba(50,46,41,0.14); font-size: 13px; }
+  .plan-entry .period{ font-weight:700; margin-bottom:3px; color: var(--cover-brown); }
+  .plan-entry .meta-line{ color: var(--ink); margin-bottom:2px; line-height:1.5; }
+  .plan-entry .meta-line b{ font-weight:700; color: var(--accent-green); }
+  .plan-entry .entry-actions{ margin-top:6px; display:flex; gap:12px; }
+  .plan-entry .entry-actions button{ background:none; border:none; padding:0; font-size: 11.5px; color: var(--ink-soft); text-decoration: underline; }
+  .plan-entry .entry-actions button:hover{ color: var(--accent-green); }
+
+  .revisions{ margin-top: 8px; display:none; }
+  .revisions.open{ display:block; }
+  .revisions .rev-item{ font-size: 11px; color: var(--ink-soft); padding: 4px 0; }
+  .revisions .rev-empty{ font-size:11px; color:var(--ink-soft); font-style:italic; }
+
+  .empty-note{ font-size: 12.5px; color: var(--ink-soft); padding: 12px 0; }
+  #save-status{ font-size: 11.5px; color: var(--ink-soft); margin-top: 6px; min-height: 14px; }
+  #save-status.err{ color: var(--title-red); font-weight:700; }
+
+  @media (max-width: 720px){
+    .diary-spread{ flex-direction: column; width: var(--page-w); }
+    .spine{ display:none; }
+    .page:first-child{ border-radius: 4px 4px 0 0; padding: 36px 34px 40px; }
+    .page:last-child{ border-radius: 0 0 4px 4px; padding: 36px 34px 40px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="cover-screen">
+  <div class="brand-caps">PLANDOSEE</div>
+  <div class="brand-script">Diary</div>
+  <div class="page-fold" id="page-fold"></div>
+</div>
+
+<div id="app-root">
+  <div class="diary-spread">
+    <div class="close-tab" id="close-tab">다이어리 덮기</div>
+    <div class="spine"></div>
+
+    <div class="page page-left">
+      <h1 class="brand-mark"><span class="brand-caps">PLANDOSEE</span><span class="brand-script">Diary</span></h1>
+      <p class="subhead">계획 → 실제로 한 일 → 돌아보기</p>
+      <p class="tagline">완벽하지 않아도 괜찮아요, 계속 쓰는 게 중요해요</p>
+      <div class="notice">지금은 로그인이 없어 링크를 아는 사람은 누구나 볼 수 있습니다. 남이 봐도 괜찮은 내용만 넣으세요.</div>
+
+      <h2 class="section-title">Calendar</h2>
+      <div class="cal-head">
+        <button type="button" id="cal-prev">‹</button>
+        <span class="cal-title" id="cal-title"></span>
+        <button type="button" id="cal-next">›</button>
+      </div>
+      <table class="cal-grid">
+        <thead><tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr></thead>
+        <tbody id="cal-body"></tbody>
+      </table>
+      <div class="cal-legend"><span class="swatch"></span> 계획 기간</div>
+    </div>
+
+    <div class="page page-right">
+      <h2 class="section-title" style="margin-top:0;">Plan</h2>
+
+      <form id="plan-form">
+        <div class="field-row">
+          <label>기간</label>
+          <div class="period-row">
+            <input type="date" id="period-start" required>
+            <span>~</span>
+            <input type="date" id="period-end" required>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <label>우선순위</label>
+          <div class="priority-options">
+            <label><input type="radio" name="priority" value="높음" checked><span>높음</span></label>
+            <label><input type="radio" name="priority" value="중간"><span>중간</span></label>
+            <label><input type="radio" name="priority" value="낮음"><span>낮음</span></label>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <label>성공 기준</label>
+          <textarea id="success-criteria" placeholder="예: 주 3회 이상, 웨이트 40분 + 유산소 20분" required></textarea>
+        </div>
+
+        <div class="field-row">
+          <label>예상 시간</label>
+          <div class="est-row">
+            <input type="number" id="estimated-minutes" min="0" required>
+            <span>분</span>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" id="btn-cancel">수정 취소</button>
+          <button type="submit" class="btn-save" id="btn-save">계획 저장</button>
+        </div>
+        <div id="save-status"></div>
+      </form>
+
+      <h2 class="section-title">Saved Plans</h2>
+      <div id="plan-list"><div class="empty-note">불러오는 중...</div></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  var SUPABASE_URL = "https://kdlnzkdltpccimhnbvdz.supabase.co";
+  var SUPABASE_KEY = "sb_publishable_v5p97keSIDRtbqb30A3lSg_InIw8b5K";
+  var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  var coverScreen = document.getElementById('cover-screen');
+  var pageFold = document.getElementById('page-fold');
+  var appRoot = document.getElementById('app-root');
+  var closeTab = document.getElementById('close-tab');
+  var appStarted = false;
+
+  pageFold.addEventListener('click', function(){
+    coverScreen.style.display = 'none';
+    appRoot.classList.add('open');
+    if(!appStarted){ appStarted = true; startApp(); }
+  });
+  closeTab.addEventListener('click', function(){
+    appRoot.classList.remove('open');
+    coverScreen.style.display = 'flex';
+  });
+
+  var form = document.getElementById('plan-form');
+  var periodStart = document.getElementById('period-start');
+  var periodEnd = document.getElementById('period-end');
+  var successCriteria = document.getElementById('success-criteria');
+  var estimatedMinutes = document.getElementById('estimated-minutes');
+  var btnSave = document.getElementById('btn-save');
+  var btnCancel = document.getElementById('btn-cancel');
+  var saveStatus = document.getElementById('save-status');
+  var planListEl = document.getElementById('plan-list');
+
+  var editingPlanId = null;
+  var currentPlans = [];
+  var calYear, calMonth;
+
+  function todayISO(offsetDays){
+    var d = new Date();
+    d.setDate(d.getDate() + (offsetDays || 0));
+    return d.toISOString().slice(0,10);
+  }
+  function pad2(n){ return String(n).padStart(2,'0'); }
+
+  function getPriorityValue(){
+    var checked = form.querySelector('input[name="priority"]:checked');
+    return checked ? checked.value : '중간';
+  }
+  function setPriorityValue(v){
+    form.querySelectorAll('input[name="priority"]').forEach(function(r){ r.checked = (r.value === v); });
+  }
+  function setStatus(msg, isErr){
+    saveStatus.textContent = msg;
+    saveStatus.className = isErr ? 'err' : '';
+  }
+  function resetFormToNew(){
+    editingPlanId = null;
+    btnSave.textContent = '계획 저장';
+    btnCancel.classList.remove('show');
+    form.reset();
+    setPriorityValue('중간');
+  }
+  function loadPlanIntoForm(p){
+    editingPlanId = p.id;
+    periodStart.value = p.period_start;
+    periodEnd.value = p.period_end;
+    setPriorityValue(p.priority);
+    successCriteria.value = p.success_criteria;
+    estimatedMinutes.value = p.estimated_minutes;
+    btnSave.textContent = '수정 내용 저장';
+    btnCancel.classList.add('show');
+  }
+  btnCancel.addEventListener('click', resetFormToNew);
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    var payload = {
+      period_start: periodStart.value,
+      period_end: periodEnd.value,
+      priority: getPriorityValue(),
+      success_criteria: successCriteria.value,
+      estimated_minutes: Number(estimatedMinutes.value)
+    };
+    btnSave.disabled = true;
+    setStatus('저장하는 중...');
+
+    var result = editingPlanId
+      ? await sb.from('plans').update(payload).eq('id', editingPlanId)
+      : await sb.from('plans').insert(payload);
+
+    btnSave.disabled = false;
+    if(result.error){
+      setStatus('✕ 저장 실패: ' + result.error.message, true);
+      return;
+    }
+    setStatus(editingPlanId ? '수정 내용이 저장됐습니다 (이전 내용은 이력에 남았습니다)' : '새 계획이 저장됐습니다');
+    resetFormToNew();
+    await loadPlansAndRender();
+  });
+
+  async function fetchRevisions(planId){
+    var res = await sb.from('plan_revisions').select('*').eq('plan_id', planId).order('revised_at', { ascending:false });
+    return res.error ? [] : (res.data || []);
+  }
+
+  function renderPlanList(plans){
+    if(plans.length === 0){
+      planListEl.innerHTML = '<div class="empty-note">저장된 계획이 없습니다.</div>';
+      return;
+    }
+    planListEl.innerHTML = '';
+    plans.forEach(function(p){
+      var entry = document.createElement('div');
+      entry.className = 'plan-entry';
+
+      var period = document.createElement('div');
+      period.className = 'period';
+      period.textContent = p.period_start + ' ~ ' + p.period_end;
+
+      var priorityLine = document.createElement('div');
+      priorityLine.className = 'meta-line';
+      priorityLine.innerHTML = '우선순위: <b>' + p.priority + '</b>';
+
+      var criteriaLine = document.createElement('div');
+      criteriaLine.className = 'meta-line';
+      criteriaLine.textContent = '성공 기준: ' + p.success_criteria;
+
+      var estLine = document.createElement('div');
+      estLine.className = 'meta-line';
+      estLine.textContent = '예상 시간: ' + p.estimated_minutes + '분';
+
+      var actions = document.createElement('div');
+      actions.className = 'entry-actions';
+
+      var editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.textContent = '수정';
+      editBtn.addEventListener('click', function(){ loadPlanIntoForm(p); });
+
+      var revBtn = document.createElement('button');
+      revBtn.type = 'button';
+      revBtn.textContent = '이전 버전 보기';
+
+      var revBox = document.createElement('div');
+      revBox.className = 'revisions';
+      var loaded = false;
+
+      revBtn.addEventListener('click', async function(){
+        var isOpen = revBox.classList.contains('open');
+        if(isOpen){ revBox.classList.remove('open'); revBtn.textContent = '이전 버전 보기'; return; }
+        revBtn.textContent = '이전 버전 닫기';
+        revBox.classList.add('open');
+        if(!loaded){
+          revBox.innerHTML = '<div class="rev-empty">불러오는 중...</div>';
+          var revisions = await fetchRevisions(p.id);
+          loaded = true;
+          if(revisions.length === 0){
+            revBox.innerHTML = '<div class="rev-empty">아직 수정 이력이 없습니다</div>';
+            return;
+          }
+          revBox.innerHTML = '';
+          revisions.forEach(function(r){
+            var item = document.createElement('div');
+            item.className = 'rev-item';
+            var when = new Date(r.revised_at).toLocaleString('ko-KR');
+            item.textContent = when + ' 수정 전 — ' + r.period_start + '~' + r.period_end + ' / ' + r.priority + ' / ' + r.success_criteria + ' / ' + r.estimated_minutes + '분';
+            revBox.appendChild(item);
+          });
+        }
+      });
+
+      actions.appendChild(editBtn);
+      actions.appendChild(revBtn);
+
+      entry.appendChild(period);
+      entry.appendChild(priorityLine);
+      entry.appendChild(criteriaLine);
+      entry.appendChild(estLine);
+      entry.appendChild(actions);
+      entry.appendChild(revBox);
+      planListEl.appendChild(entry);
+    });
+  }
+
+  var calTitleEl = document.getElementById('cal-title');
+  var calBodyEl = document.getElementById('cal-body');
+
+  function dateInAnyPlan(dateStr){
+    return currentPlans.some(function(p){
+      return dateStr >= p.period_start && dateStr <= p.period_end;
+    });
+  }
+
+  function renderCalendar(){
+    var first = new Date(calYear, calMonth, 1);
+    var startDow = first.getDay();
+    var daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+    var todayStr = todayISO(0);
+
+    calTitleEl.textContent = calYear + '. ' + pad2(calMonth+1);
+
+    var rows = [];
+    var cells = [];
+    for(var i=0;i<startDow;i++){ cells.push('<td class="blank"></td>'); }
+    for(var d=1; d<=daysInMonth; d++){
+      var dateStr = calYear + '-' + pad2(calMonth+1) + '-' + pad2(d);
+      var cls = [];
+      if(dateInAnyPlan(dateStr)) cls.push('in-plan');
+      if(dateStr === todayStr) cls.push('today');
+      var inner = (dateStr === todayStr) ? '<span>'+d+'</span>' : d;
+      cells.push('<td class="'+cls.join(' ')+'">'+inner+'</td>');
+      if(cells.length === 7){ rows.push('<tr>'+cells.join('')+'</tr>'); cells = []; }
+    }
+    if(cells.length){
+      while(cells.length < 7){ cells.push('<td class="blank"></td>'); }
+      rows.push('<tr>'+cells.join('')+'</tr>');
+    }
+    calBodyEl.innerHTML = rows.join('');
+  }
+
+  document.getElementById('cal-prev').addEventListener('click', function(){
+    calMonth--; if(calMonth < 0){ calMonth = 11; calYear--; }
+    renderCalendar();
+  });
+  document.getElementById('cal-next').addEventListener('click', function(){
+    calMonth++; if(calMonth > 11){ calMonth = 0; calYear++; }
+    renderCalendar();
+  });
+
+  async function loadPlansAndRender(){
+    planListEl.innerHTML = '<div class="empty-note">불러오는 중...</div>';
+    var res = await sb.from('plans').select('*').order('created_at', { ascending:false });
+    if(res.error){
+      planListEl.innerHTML = '<div class="empty-note">✕ 목록을 불러오지 못했습니다: ' + res.error.message + '</div>';
+      currentPlans = [];
+      renderCalendar();
+      return;
+    }
+    currentPlans = res.data || [];
+    renderPlanList(currentPlans);
+    renderCalendar();
+  }
+
+  async function seedExampleIfEmpty(){
+    var res = await sb.from('plans').select('id', { count:'exact', head:true });
+    if(res.error){ return; }
+    if(res.count && res.count > 0){ return; }
+    await sb.from('plans').insert({
+      period_start: todayISO(0),
+      period_end: todayISO(27),
+      priority: '높음',
+      success_criteria: '주 3회 이상, 웨이트 40분 + 유산소 20분',
+      estimated_minutes: 720
+    });
+  }
+
+  function startApp(){
+    var now = new Date();
+    calYear = now.getFullYear();
+    calMonth = now.getMonth();
+    periodStart.value = todayISO(0);
+    periodEnd.value = todayISO(27);
+    seedExampleIfEmpty().then(loadPlansAndRender);
+  }
+
+})();
+</script>
+
+</body>
+</html>
