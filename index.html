@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>?뚮옖?먯뵪 ?ㅼ씠?대━</title>
+<title>플랜두씨 다이어리</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Alex+Brush&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -36,7 +36,7 @@
 
   .title-font{ font-family: 'Alex Brush', cursive; }
 
-  /* ---------- ?ロ엺 ?쒖? ---------- */
+  /* ---------- 표지 화면 ---------- */
   #cover-screen{
     width: var(--page-w);
     height: var(--book-h);
@@ -67,6 +67,20 @@
     margin-top: 2px;
     text-shadow: 0 3px 6px rgba(0,0,0,0.35);
   }
+  #cover-logout{
+    position:absolute;
+    top: 14px; right: 16px;
+    background:none;
+    border: 1px solid rgba(255,255,255,0.5);
+    color:#fff;
+    font-size: 11px;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor:pointer;
+    z-index: 5;
+    font-family:'Noto Sans KR', sans-serif;
+  }
+  #cover-logout:hover{ background: rgba(255,255,255,0.15); }
 
   .page-fold{
     position:absolute;
@@ -110,7 +124,7 @@
     border-radius: 4px;
   }
 
-  /* 以묒븰 ?쒕낯??- ????紐낆븫留? ?ㅽ봽留?洹몃옒???놁쓬 */
+  /* 중앙 제본선 - 그림자만, 이미지 없음 */
   .spine{
     position:absolute;
     left:50%; top:0; bottom:0;
@@ -144,7 +158,7 @@
   .page:first-child{ border-radius: 4px 0 0 4px; padding-right: 30px; }
   .page:last-child{ border-radius: 0 4px 4px 0; padding-left: 30px; }
 
-  /* ---------- ?쒗듃(?섏씠吏 ?섍?) ---------- */
+  /* ---------- 시트(페이지 섹션) ---------- */
   .sheet{ min-height: 0; }
   .page-num{
     position:absolute; top: 14px; right: 20px;
@@ -277,7 +291,7 @@
   .revisions .rev-item{ font-size: 11px; color: var(--ink-soft); padding: 4px 0; }
   .revisions .rev-empty{ font-size:11px; color:var(--ink-soft); font-style:italic; }
 
-  /* ---------- ????---------- */
+  /* ---------- 할 일 ---------- */
   .todo-controls{
     display:flex; gap:8px; margin-top: 6px; flex-wrap: wrap;
   }
@@ -313,13 +327,13 @@
   }
   .todo-entry .todo-actions button:hover{ color: var(--accent-green); }
 
-  /* ---------- ?ㅽ뻾 湲곕줉 (Do) ---------- */
+  /* ---------- 실행 기록 (Do) ---------- */
   .run-entry{ padding: 9px 0; border-bottom: 1px dashed rgba(50,46,41,0.14); font-size: 12.5px; }
   .run-entry .run-todo{ font-weight:700; margin-bottom:2px; }
   .run-entry .run-meta{ color: var(--ink-soft); line-height:1.6; }
   .run-entry .run-blocked{ color: var(--title-red); margin-top:2px; }
 
-  /* ---------- ?뚯븘蹂닿린 (See) ---------- */
+  /* ---------- 돌아보기 (See) ---------- */
   .stat-grid{
     display:grid; grid-template-columns: 1fr 1fr; gap: 10px;
     margin: 10px 0 16px;
@@ -387,7 +401,8 @@
     </div>
   </div>
 </div>
-<div id="cover-screen">
+<div id="cover-screen" style="display:none;">
+  <button type="button" id="cover-logout" onclick="handleLogout()">로그아웃</button>
   <div class="brand-caps">PLANDOSEE</div>
   <div class="brand-script">Diary</div>
   <div class="page-fold" id="page-fold"></div>
@@ -395,29 +410,29 @@
 
 <div id="app-root">
   <div class="diary-spread">
-    <div class="close-tab" id="close-tab">?ㅼ씠?대━ ??린</div>
+    <div class="close-tab" id="close-tab">다이어리 닫기</div>
     <div class="spine"></div>
 
     <div class="page page-left">
       <h1 class="brand-mark"><span class="brand-caps">PLANDOSEE</span><span class="brand-script">Diary</span></h1>
-      <p class="subhead">怨꾪쉷 ???ㅼ젣濡????????뚯븘蹂닿린</p>
-      <p class="tagline">?꾨꼍?섏? ?딆븘??愿쒖갖?꾩슂, 怨꾩냽 ?곕뒗 寃?以묒슂?댁슂</p>
-      <div class="notice">吏湲덉? 濡쒓렇?몄씠 ?놁뼱 留곹겕瑜??꾨뒗 ?щ엺? ?꾧뎄??蹂????덉뒿?덈떎. ?⑥씠 遊먮룄 愿쒖갖? ?댁슜留??ｌ쑝?몄슂.</div>
+      <p class="subhead">계획하고, 실행하고, 다시 돌아보기</p>
+      <p class="tagline">완벽하지 않아도 괜찮아요, 계속 하는 게 중요해요</p>
+      <div class="notice">로그인한 계정에서만 볼 수 있는 나만의 다이어리입니다.</div>
 
       <h2 class="section-title">Calendar</h2>
       <div class="cal-head">
-        <button type="button" id="cal-prev">??/button>
+        <button type="button" id="cal-prev">&lsaquo;</button>
         <span class="cal-title" id="cal-title"></span>
-        <button type="button" id="cal-next">??/button>
+        <button type="button" id="cal-next">&rsaquo;</button>
       </div>
       <table class="cal-grid">
-        <thead><tr><th>??/th><th>??/th><th>??/th><th>??/th><th>紐?/th><th>湲?/th><th>??/th></tr></thead>
+        <thead><tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr></thead>
         <tbody id="cal-body"></tbody>
       </table>
-      <div class="cal-legend"><span class="swatch"></span> 怨꾪쉷 湲곌컙</div>
+      <div class="cal-legend"><span class="swatch"></span> 계획 기간</div>
 
       <div class="page-turn prev" id="page-turn-prev"></div>
-      <div class="page-turn-label prev" id="page-turn-prev-label">?댁쟾?μ쑝濡?/div>
+      <div class="page-turn-label prev" id="page-turn-prev-label">이전으로</div>
     </div>
 
     <div class="page page-right">
@@ -428,7 +443,7 @@
 
       <form id="plan-form">
         <div class="field-row">
-          <label>湲곌컙</label>
+          <label>기간</label>
           <div class="period-row">
             <input type="date" id="period-start" required>
             <span>~</span>
@@ -437,36 +452,36 @@
         </div>
 
         <div class="field-row">
-          <label>?곗꽑?쒖쐞</label>
+          <label>우선순위</label>
           <div class="priority-options">
-            <label><input type="radio" name="priority" value="?믪쓬" checked><span>?믪쓬</span></label>
-            <label><input type="radio" name="priority" value="以묎컙"><span>以묎컙</span></label>
-            <label><input type="radio" name="priority" value="??쓬"><span>??쓬</span></label>
+            <label><input type="radio" name="priority" value="높음" checked><span>높음</span></label>
+            <label><input type="radio" name="priority" value="중간"><span>중간</span></label>
+            <label><input type="radio" name="priority" value="낮음"><span>낮음</span></label>
           </div>
         </div>
 
         <div class="field-row">
-          <label>?깃났 湲곗?</label>
-          <textarea id="success-criteria" placeholder="?? 二?3???댁긽, ?⑥씠??40遺?+ ?좎궛??20遺? required></textarea>
+          <label>성공 기준</label>
+          <textarea id="success-criteria" placeholder="예: 주 3회 이상, 아침에 40분 + 저녁에 20분" required></textarea>
         </div>
 
         <div class="field-row">
-          <label>?덉긽 ?쒓컙</label>
+          <label>예상 시간</label>
           <div class="est-row">
             <input type="number" id="estimated-minutes" min="0" required>
-            <span>遺?/span>
+            <span>분</span>
           </div>
         </div>
 
         <div class="form-actions">
-          <button type="button" class="btn-cancel" id="btn-cancel">?섏젙 痍⑥냼</button>
-          <button type="submit" class="btn-save" id="btn-save">怨꾪쉷 ???/button>
+          <button type="button" class="btn-cancel" id="btn-cancel">수정 취소</button>
+          <button type="submit" class="btn-save" id="btn-save">계획 저장</button>
         </div>
         <div id="save-status"></div>
       </form>
 
       <h2 class="section-title">Saved Plans</h2>
-      <div id="plan-list"><div class="empty-note">遺덈윭?ㅻ뒗 以?..</div></div>
+      <div id="plan-list"><div class="empty-note">불러오는 중...</div></div>
       </div><!-- /sheet-plan -->
 
       <div class="sheet" id="sheet-todo" style="display:none;">
@@ -474,69 +489,69 @@
 
       <form id="todo-form">
         <div class="field-row">
-          <label>?????쇱씠 ?몃┛ 怨꾪쉷</label>
+          <label>이 할일이 속한 계획</label>
           <select id="todo-plan-select" required></select>
         </div>
         <div class="field-row">
-          <label>?쒕ぉ</label>
+          <label>제목</label>
           <input type="text" id="todo-title" required>
         </div>
         <div class="field-row">
-          <label>?댁슜</label>
-          <textarea id="todo-content" placeholder="援ъ껜?곸쑝濡?萸??좎?"></textarea>
+          <label>내용</label>
+          <textarea id="todo-content" placeholder="구체적으로 무엇을 할지 적기"></textarea>
         </div>
         <div class="field-row">
           <div class="period-row">
             <div style="flex:1;">
-              <label>留덇컧??/label>
+              <label>마감일</label>
               <input type="date" id="todo-due">
             </div>
             <div style="flex:1;">
-              <label>?덉긽 ?쒓컙</label>
-              <input type="number" id="todo-estimated" min="0" placeholder="遺?>
+              <label>예상 시간</label>
+              <input type="number" id="todo-estimated" min="0" placeholder="분">
             </div>
           </div>
         </div>
         <div class="field-row">
-          <label>?곗꽑?쒖쐞</label>
+          <label>우선순위</label>
           <div class="priority-options">
-            <label><input type="radio" name="todo-priority" value="?믪쓬" checked><span>?믪쓬</span></label>
-            <label><input type="radio" name="todo-priority" value="以묎컙"><span>以묎컙</span></label>
-            <label><input type="radio" name="todo-priority" value="??쓬"><span>??쓬</span></label>
+            <label><input type="radio" name="todo-priority" value="높음" checked><span>높음</span></label>
+            <label><input type="radio" name="todo-priority" value="중간"><span>중간</span></label>
+            <label><input type="radio" name="todo-priority" value="낮음"><span>낮음</span></label>
           </div>
         </div>
         <div class="field-row">
-          <label>?쒓렇 (?쇳몴濡?援щ텇, ?? 洹쇰젰,?꾩묠)</label>
-          <input type="text" id="todo-tags" placeholder="洹쇰젰, ?꾩묠">
+          <label>태그 (쉼표로 구분, 예: 운동,공부)</label>
+          <input type="text" id="todo-tags" placeholder="운동, 공부">
         </div>
         <div class="form-actions">
-          <button type="button" class="btn-cancel" id="todo-btn-cancel">?섏젙 痍⑥냼</button>
-          <button type="submit" class="btn-save" id="todo-btn-save">???????/button>
+          <button type="button" class="btn-cancel" id="todo-btn-cancel">수정 취소</button>
+          <button type="submit" class="btn-save" id="todo-btn-save">할일 저장</button>
         </div>
         <div id="todo-save-status"></div>
       </form>
 
       <div class="todo-controls">
-        <input type="text" id="todo-search" placeholder="寃??(?쒕ぉ쨌?댁슜)">
+        <input type="text" id="todo-search" placeholder="검색(제목·내용)">
         <select id="todo-filter-status">
-          <option value="all">?꾩껜</option>
-          <option value="in_progress">吏꾪뻾以?/option>
-          <option value="done">?꾨즺</option>
+          <option value="all">전체</option>
+          <option value="in_progress">진행중</option>
+          <option value="done">완료</option>
         </select>
         <select id="todo-sort">
-          <option value="due_asc">留덇컧??鍮좊Ⅸ??/option>
-          <option value="priority">?곗꽑?쒖쐞??(?믪쓬?믩궙??</option>
-          <option value="estimated_desc">?덉긽?쒓컙 留롮???/option>
+          <option value="due_asc">마감일 빠른순</option>
+          <option value="priority">우선순위순 (높음→낮음)</option>
+          <option value="estimated_desc">예상시간 많은순</option>
         </select>
       </div>
       <div class="sort-label" id="todo-sort-label"></div>
 
       <div class="drill-banner" id="drill-banner" style="display:none;">
         <span id="drill-banner-text"></span>
-        <button type="button" id="drill-clear">?꾪꽣 珥덇린??/button>
+        <button type="button" id="drill-clear">필터 초기화</button>
       </div>
 
-      <div id="todo-list"><div class="empty-note">遺덈윭?ㅻ뒗 以?..</div></div>
+      <div id="todo-list"><div class="empty-note">불러오는 중...</div></div>
       </div><!-- /sheet-todo -->
 
       <div class="sheet" id="sheet-do" style="display:none;">
@@ -544,64 +559,64 @@
 
       <form id="run-form">
         <div class="field-row">
-          <label>?대뒓 ???쇱쓣 ?덈굹??/label>
+          <label>어느 할일을 했나요?</label>
           <select id="run-todo-select" required></select>
         </div>
         <div class="field-row">
           <div class="period-row">
             <div style="flex:1;">
-              <label>?쒖옉 ?쒓컖</label>
+              <label>시작 시각</label>
               <input type="datetime-local" id="run-start" required>
             </div>
             <div style="flex:1;">
-              <label>?앸궃 ?쒓컖</label>
+              <label>끝난 시각</label>
               <input type="datetime-local" id="run-end" required>
             </div>
           </div>
         </div>
         <div class="field-row">
-          <label>留됲삍???댁쑀 (?놁쑝硫?鍮꾩썙?먯꽭??</label>
-          <input type="text" id="run-blocked" placeholder="?? 鍮꾧? ???紐??섍컧">
+          <label>막힌 이유 (없으면 비워두세요)</label>
+          <input type="text" id="run-blocked" placeholder="예: 비가 와서 못 나감">
         </div>
         <div class="form-actions">
-          <button type="submit" class="btn-save" id="run-btn-save">?ㅽ뻾 湲곕줉 ???/button>
+          <button type="submit" class="btn-save" id="run-btn-save">실행 기록 저장</button>
         </div>
         <div id="run-save-status"></div>
       </form>
 
       <h2 class="section-title">Log</h2>
-      <div id="run-list"><div class="empty-note">遺덈윭?ㅻ뒗 以?..</div></div>
+      <div id="run-list"><div class="empty-note">불러오는 중...</div></div>
       </div><!-- /sheet-do -->
 
       <div class="sheet" id="sheet-see" style="display:none;">
       <h2 class="section-title" style="margin-top:0;">See</h2>
 
       <div class="field-row">
-        <label>?대뒓 怨꾪쉷???뚯븘蹂쇨퉴??/label>
+        <label>어느 계획을 돌아볼까요?</label>
         <select id="see-plan-select"></select>
       </div>
 
-      <div id="see-stats"><div class="empty-note">遺덈윭?ㅻ뒗 以?..</div></div>
+      <div id="see-stats"><div class="empty-note">불러오는 중...</div></div>
 
       <h2 class="section-title">Next</h2>
       <div class="field-row">
-        <label>?대쾲???뚯븘蹂닿퀬 怨좎튌 ????以?/label>
-        <textarea id="see-note" placeholder="?? ????쎌냽????븘???ㅼ쟾 ?대룞?쇰줈 諛붽씀??></textarea>
+        <label>이번엔 돌아보고 고칠 것 하나</label>
+        <textarea id="see-note" placeholder="예: 다음주엔 산책 대신 실내운동으로 바꾸기"></textarea>
       </div>
       <div class="form-actions">
-        <button type="button" class="btn-save" id="see-carry-btn">?ㅼ쓬 怨꾪쉷??諛섏쁺?섍린</button>
+        <button type="button" class="btn-save" id="see-carry-btn">다음 계획에 반영하기</button>
       </div>
       <div id="see-carry-status"></div>
 
       <h2 class="section-title">Export</h2>
       <div class="form-actions" style="justify-content:flex-start;">
-        <button type="button" class="btn-save" id="export-btn">?꾩껜 ?먮즺 ?대낫?닿린 (JSON)</button>
+        <button type="button" class="btn-save" id="export-btn">전체 자료 내보내기 (JSON)</button>
       </div>
       <div id="export-status"></div>
       </div><!-- /sheet-see -->
 
       <div class="page-turn next" id="page-turn-next"></div>
-      <div class="page-turn-label next" id="page-turn-next-label">?ㅼ쓬?μ쑝濡?/div>
+      <div class="page-turn-label next" id="page-turn-next-label">다음으로</div>
     </div>
   </div>
 </div>
@@ -612,14 +627,82 @@
   "use strict";
 
   var SUPABASE_URL = "https://kdlnzkdltpccimhnbvdz.supabase.co";
-  var SUPABASE_KEY = "sb_publishable_v5p97keSIDRtbqb30A3lSg_InIw8b5K";
-  var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  var SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkbG56a2RsdHBjY2ltaG5idmR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MzU4ODcsImV4cCI6MjEwNTAxMTg4N30._iv7SyzGqQWtlyRoZNgAuIVqMF8O0EpKNZBRmXHfPvs";
+  var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  /* ================= 인증 ================= */
+  var authScreen = document.getElementById('auth-screen');
   var coverScreen = document.getElementById('cover-screen');
-  var pageFold = document.getElementById('page-fold');
   var appRoot = document.getElementById('app-root');
-  var closeTab = document.getElementById('close-tab');
   var appStarted = false;
+
+  function switchTab(tab){
+    document.getElementById('form-login').style.display = tab === 'login' ? '' : 'none';
+    document.getElementById('form-signup').style.display = tab === 'signup' ? '' : 'none';
+    document.getElementById('tab-login').style.cssText = tab === 'login'
+      ? 'flex:1;padding:10px;text-align:center;cursor:pointer;font-size:14px;color:#4f46e5;border-bottom:2px solid #4f46e5;font-weight:600;margin-bottom:-2px;'
+      : 'flex:1;padding:10px;text-align:center;cursor:pointer;font-size:14px;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;';
+    document.getElementById('tab-signup').style.cssText = tab === 'signup'
+      ? 'flex:1;padding:10px;text-align:center;cursor:pointer;font-size:14px;color:#4f46e5;border-bottom:2px solid #4f46e5;font-weight:600;margin-bottom:-2px;'
+      : 'flex:1;padding:10px;text-align:center;cursor:pointer;font-size:14px;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;';
+    document.getElementById('auth-error').style.display = 'none';
+  }
+  window.switchTab = switchTab;
+
+  function showError(msg){
+    var el = document.getElementById('auth-error');
+    el.textContent = msg;
+    el.style.display = 'block';
+  }
+
+  window.handleLogin = async function(){
+    var email = document.getElementById('login-email').value.trim();
+    var password = document.getElementById('login-password').value;
+    if(!email || !password){ showError('이메일과 비밀번호를 입력해주세요.'); return; }
+    var result = await sb.auth.signInWithPassword({ email: email, password: password });
+    if(result.error){ showError('이메일 또는 비밀번호를 확인해주세요.'); return; }
+  };
+
+  window.handleSignup = async function(){
+    var email = document.getElementById('signup-email').value.trim();
+    var password = document.getElementById('signup-password').value;
+    var password2 = document.getElementById('signup-password2').value;
+    if(!email || !password){ showError('이메일과 비밀번호를 입력해주세요.'); return; }
+    if(password !== password2){ showError('비밀번호가 일치하지 않습니다.'); return; }
+    if(password.length < 6){ showError('비밀번호는 6자 이상이어야 합니다.'); return; }
+    var result = await sb.auth.signUp({ email: email, password: password });
+    if(result.error){
+      if(result.error.message.includes('already registered')){
+        showError('이미 가입된 이메일입니다.');
+      } else {
+        showError('가입 중 오류가 발생했습니다: ' + result.error.message);
+      }
+      return;
+    }
+    alert('가입 완료! 로그인해주세요.');
+    switchTab('login');
+  };
+
+  window.handleLogout = async function(){
+    await sb.auth.signOut();
+  };
+
+  sb.auth.onAuthStateChange(function(event, session){
+    if(session){
+      authScreen.style.display = 'none';
+      coverScreen.style.display = 'flex';
+      appRoot.style.display = '';
+    } else {
+      authScreen.style.display = 'flex';
+      coverScreen.style.display = 'none';
+      appRoot.style.display = 'none';
+      appRoot.classList.remove('open');
+    }
+  });
+
+  /* ================= 다이어리 표지 / 책 넘기기 ================= */
+  var pageFold = document.getElementById('page-fold');
+  var closeTab = document.getElementById('close-tab');
 
   pageFold.addEventListener('click', function(){
     coverScreen.style.display = 'none';
@@ -631,13 +714,13 @@
     coverScreen.style.display = 'flex';
   });
 
-  /* ---------- ?쒗듃(?섏씠吏 ?섍?) ---------- */
+  /* ---------- 시트(페이지 섹션) ---------- */
   var SHEETS = ['sheet-plan', 'sheet-todo', 'sheet-do', 'sheet-see'];
   var SHEET_LABELS = {
-    'sheet-plan':'1 / 4 쨌 Plan',
-    'sheet-todo':'2 / 4 쨌 Todo',
-    'sheet-do':'3 / 4 쨌 Do',
-    'sheet-see':'4 / 4 쨌 See'
+    'sheet-plan':'1 / 4 · Plan',
+    'sheet-todo':'2 / 4 · Todo',
+    'sheet-do':'3 / 4 · Do',
+    'sheet-see':'4 / 4 · See'
   };
   var currentSheetIndex = 0;
   var pageNumEl = document.getElementById('page-num');
@@ -687,7 +770,7 @@
 
   function getPriorityValue(){
     var checked = form.querySelector('input[name="priority"]:checked');
-    return checked ? checked.value : '以묎컙';
+    return checked ? checked.value : '중간';
   }
   function setPriorityValue(v){
     form.querySelectorAll('input[name="priority"]').forEach(function(r){ r.checked = (r.value === v); });
@@ -698,10 +781,10 @@
   }
   function resetFormToNew(){
     editingPlanId = null;
-    btnSave.textContent = '怨꾪쉷 ???;
+    btnSave.textContent = '계획 저장';
     btnCancel.classList.remove('show');
     form.reset();
-    setPriorityValue('以묎컙');
+    setPriorityValue('중간');
   }
   function loadPlanIntoForm(p){
     editingPlanId = p.id;
@@ -710,7 +793,7 @@
     setPriorityValue(p.priority);
     successCriteria.value = p.success_criteria;
     estimatedMinutes.value = p.estimated_minutes;
-    btnSave.textContent = '?섏젙 ?댁슜 ???;
+    btnSave.textContent = '수정 내용 저장';
     btnCancel.classList.add('show');
   }
   btnCancel.addEventListener('click', resetFormToNew);
@@ -725,7 +808,7 @@
       estimated_minutes: Number(estimatedMinutes.value)
     };
     btnSave.disabled = true;
-    setStatus('??ν븯??以?..');
+    setStatus('저장하는 중...');
 
     var result = editingPlanId
       ? await sb.from('plans').update(payload).eq('id', editingPlanId)
@@ -733,10 +816,10 @@
 
     btnSave.disabled = false;
     if(result.error){
-      setStatus('??????ㅽ뙣: ' + result.error.message, true);
+      setStatus('저장 실패: ' + result.error.message, true);
       return;
     }
-    setStatus(editingPlanId ? '?섏젙 ?댁슜????λ릱?듬땲??(?댁쟾 ?댁슜? ?대젰???⑥븯?듬땲??' : '??怨꾪쉷????λ릱?듬땲??);
+    setStatus(editingPlanId ? '수정 내용이 저장되었습니다. (이전 내용은 이력에 남아있습니다.)' : '새 계획이 저장되었습니다.');
     resetFormToNew();
     await loadPlansAndRender();
   });
@@ -748,7 +831,7 @@
 
   function renderPlanList(plans){
     if(plans.length === 0){
-      planListEl.innerHTML = '<div class="empty-note">??λ맂 怨꾪쉷???놁뒿?덈떎.</div>';
+      planListEl.innerHTML = '<div class="empty-note">저장된 계획이 없습니다.</div>';
       return;
     }
     planListEl.innerHTML = '';
@@ -762,27 +845,27 @@
 
       var priorityLine = document.createElement('div');
       priorityLine.className = 'meta-line';
-      priorityLine.innerHTML = '?곗꽑?쒖쐞: <b>' + p.priority + '</b>';
+      priorityLine.innerHTML = '우선순위: <b>' + p.priority + '</b>';
 
       var criteriaLine = document.createElement('div');
       criteriaLine.className = 'meta-line';
-      criteriaLine.textContent = '?깃났 湲곗?: ' + p.success_criteria;
+      criteriaLine.textContent = '성공 기준: ' + p.success_criteria;
 
       var estLine = document.createElement('div');
       estLine.className = 'meta-line';
-      estLine.textContent = '?덉긽 ?쒓컙: ' + p.estimated_minutes + '遺?;
+      estLine.textContent = '예상 시간: ' + p.estimated_minutes + '분';
 
       var actions = document.createElement('div');
       actions.className = 'entry-actions';
 
       var editBtn = document.createElement('button');
       editBtn.type = 'button';
-      editBtn.textContent = '?섏젙';
+      editBtn.textContent = '수정';
       editBtn.addEventListener('click', function(){ loadPlanIntoForm(p); });
 
       var revBtn = document.createElement('button');
       revBtn.type = 'button';
-      revBtn.textContent = '?댁쟾 踰꾩쟾 蹂닿린';
+      revBtn.textContent = '이전 버전 보기';
 
       var revBox = document.createElement('div');
       revBox.className = 'revisions';
@@ -790,15 +873,15 @@
 
       revBtn.addEventListener('click', async function(){
         var isOpen = revBox.classList.contains('open');
-        if(isOpen){ revBox.classList.remove('open'); revBtn.textContent = '?댁쟾 踰꾩쟾 蹂닿린'; return; }
-        revBtn.textContent = '?댁쟾 踰꾩쟾 ?リ린';
+        if(isOpen){ revBox.classList.remove('open'); revBtn.textContent = '이전 버전 보기'; return; }
+        revBtn.textContent = '이전 버전 접기';
         revBox.classList.add('open');
         if(!loaded){
-          revBox.innerHTML = '<div class="rev-empty">遺덈윭?ㅻ뒗 以?..</div>';
+          revBox.innerHTML = '<div class="rev-empty">불러오는 중...</div>';
           var revisions = await fetchRevisions(p.id);
           loaded = true;
           if(revisions.length === 0){
-            revBox.innerHTML = '<div class="rev-empty">?꾩쭅 ?섏젙 ?대젰???놁뒿?덈떎</div>';
+            revBox.innerHTML = '<div class="rev-empty">아직 수정 이력이 없습니다</div>';
             return;
           }
           revBox.innerHTML = '';
@@ -806,7 +889,7 @@
             var item = document.createElement('div');
             item.className = 'rev-item';
             var when = new Date(r.revised_at).toLocaleString('ko-KR');
-            item.textContent = when + ' ?섏젙 ????' + r.period_start + '~' + r.period_end + ' / ' + r.priority + ' / ' + r.success_criteria + ' / ' + r.estimated_minutes + '遺?;
+            item.textContent = when + ' 수정 전: ' + r.period_start + '~' + r.period_end + ' / ' + r.priority + ' / ' + r.success_criteria + ' / ' + r.estimated_minutes + '분';
             revBox.appendChild(item);
           });
         }
@@ -871,10 +954,10 @@
   });
 
   async function loadPlansAndRender(){
-    planListEl.innerHTML = '<div class="empty-note">遺덈윭?ㅻ뒗 以?..</div>';
+    planListEl.innerHTML = '<div class="empty-note">불러오는 중...</div>';
     var res = await sb.from('plans').select('*').order('created_at', { ascending:false });
     if(res.error){
-      planListEl.innerHTML = '<div class="empty-note">??紐⑸줉??遺덈윭?ㅼ? 紐삵뻽?듬땲?? ' + res.error.message + '</div>';
+      planListEl.innerHTML = '<div class="empty-note">계획 목록을 불러오지 못했습니다: ' + res.error.message + '</div>';
       currentPlans = [];
       renderCalendar();
       return;
@@ -893,13 +976,13 @@
     await sb.from('plans').insert({
       period_start: todayISO(0),
       period_end: todayISO(27),
-      priority: '?믪쓬',
-      success_criteria: '二?3???댁긽, ?⑥씠??40遺?+ ?좎궛??20遺?,
+      priority: '높음',
+      success_criteria: '주 3회 이상, 아침에 40분 + 저녁에 20분',
       estimated_minutes: 720
     });
   }
 
-  /* ================= ????(移대뱶2) ================= */
+  /* ================= 할 일 ================= */
   var todoForm = document.getElementById('todo-form');
   var todoPlanSelect = document.getElementById('todo-plan-select');
   var todoTitle = document.getElementById('todo-title');
@@ -920,11 +1003,11 @@
   var currentTodos = [];
 
   var SORT_LABELS = {
-    due_asc: '?뺣젹 湲곗?: 留덇컧?쇱씠 鍮좊Ⅸ ??,
-    priority: '?뺣젹 湲곗?: ?곗꽑?쒖쐞 (?믪쓬 ????쓬)',
-    estimated_desc: '?뺣젹 湲곗?: ?덉긽 ?쒓컙??留롮? ??
+    due_asc: '정렬 기준: 마감일이 빠른 순',
+    priority: '정렬 기준: 우선순위 (높음 → 낮음)',
+    estimated_desc: '정렬 기준: 예상 시간이 많은 순'
   };
-  var PRIORITY_RANK = { '?믪쓬':0, '以묎컙':1, '??쓬':2 };
+  var PRIORITY_RANK = { '높음':0, '중간':1, '낮음':2 };
 
   function populatePlanSelect(){
     var prev = todoPlanSelect.value;
@@ -942,7 +1025,7 @@
 
   function getTodoPriorityValue(){
     var c = todoForm.querySelector('input[name="todo-priority"]:checked');
-    return c ? c.value : '以묎컙';
+    return c ? c.value : '중간';
   }
   function setTodoPriorityValue(v){
     todoForm.querySelectorAll('input[name="todo-priority"]').forEach(function(r){ r.checked = (r.value === v); });
@@ -953,10 +1036,10 @@
   }
   function resetTodoForm(){
     editingTodoId = null;
-    todoBtnSave.textContent = '???????;
+    todoBtnSave.textContent = '할일 저장';
     todoBtnCancel.classList.remove('show');
     todoForm.reset();
-    setTodoPriorityValue('以묎컙');
+    setTodoPriorityValue('중간');
     populatePlanSelect();
   }
   function loadTodoIntoForm(t){
@@ -966,9 +1049,9 @@
     todoContent.value = t.content || '';
     todoDue.value = t.due_date || '';
     todoEstimated.value = t.estimated_minutes;
-    setTodoPriorityValue(t.priority || '以묎컙');
+    setTodoPriorityValue(t.priority || '중간');
     todoTags.value = (t.tags || []).join(', ');
-    todoBtnSave.textContent = '?섏젙 ?댁슜 ???;
+    todoBtnSave.textContent = '수정 내용 저장';
     todoBtnCancel.classList.add('show');
   }
   todoBtnCancel.addEventListener('click', resetTodoForm);
@@ -980,7 +1063,7 @@
   todoForm.addEventListener('submit', async function(e){
     e.preventDefault();
     if(!todoPlanSelect.value){
-      setTodoStatus('??癒쇱? 怨꾪쉷???섎굹 ?댁긽 ??ν빐二쇱꽭??, true);
+      setTodoStatus('먼저 계획을 하나 이상 저장해주세요.', true);
       return;
     }
     var payload = {
@@ -993,7 +1076,7 @@
       estimated_minutes: Number(todoEstimated.value || 0)
     };
     todoBtnSave.disabled = true;
-    setTodoStatus('??ν븯??以?..');
+    setTodoStatus('저장하는 중...');
 
     var result = editingTodoId
       ? await sb.from('todos').update(payload).eq('id', editingTodoId)
@@ -1001,20 +1084,21 @@
 
     todoBtnSave.disabled = false;
     if(result.error){
-      setTodoStatus('??????ㅽ뙣: ' + result.error.message, true);
+      setTodoStatus('저장 실패: ' + result.error.message, true);
       return;
     }
-    setTodoStatus(editingTodoId ? '?섏젙?먯뒿?덈떎' : '?????쇱씠 ??λ릱?듬땲??);
+    setTodoStatus(editingTodoId ? '수정했습니다.' : '새 할일이 저장되었습니다.');
     resetTodoForm();
     await loadTodosAndRender();
   });
 
   async function toggleTodoComplete(t){
     if(t.status === 'done'){
-      // ?섎룎由ш린: ?꾨즺 ?대깽????젣 ???곹깭 ?섎룎由?      await sb.from('completion_events').delete().eq('todo_id', t.id);
+      // 되돌리기: 완료 이벤트 삭제 후 상태를 되돌림
+      await sb.from('completion_events').delete().eq('todo_id', t.id);
       await sb.from('todos').update({ status:'in_progress' }).eq('id', t.id);
     } else {
-      // ?꾨즺: ?대깽?멸? ?대? ?덉쑝硫??고?) unique ?쒖빟??留됱븘二쇰?濡??먮윭??臾댁떆
+      // 완료: 이벤트가 이미 있으면(재클릭) unique 제약으로 막아주므로 에러는 무시
       await sb.from('completion_events').insert({ todo_id: t.id });
       await sb.from('todos').update({ status:'done' }).eq('id', t.id);
     }
@@ -1075,8 +1159,8 @@
     var drillBannerEl = document.getElementById('drill-banner');
     var drillBannerTextEl = document.getElementById('drill-banner-text');
     if(drillFilter){
-      var modeText = { all:'?꾩껜', done:'?꾨즺', overdue:'吏??, blocked:'留됲옒' }[drillFilter.mode] || drillFilter.mode;
-      drillBannerTextEl.textContent = '?뚯븘蹂닿린?먯꽌 ?대룞??쨌 "' + modeText + '" 議곌굔?????쇰쭔 ?쒖떆 以?;
+      var modeText = { all:'전체', done:'완료', overdue:'지연', blocked:'막힘' }[drillFilter.mode] || drillFilter.mode;
+      drillBannerTextEl.textContent = '돌아보기에서 이동함 · "' + modeText + '" 조건에 맞는 할일만 표시 중';
       drillBannerEl.style.display = 'flex';
     } else {
       drillBannerEl.style.display = 'none';
@@ -1084,11 +1168,11 @@
     todoSortLabelEl.textContent = SORT_LABELS[todoSortEl.value] || '';
     var list = getFilteredSortedTodos();
     if(currentTodos.length === 0){
-      todoListEl.innerHTML = '<div class="empty-note">???쇱씠 ?놁뒿?덈떎.</div>';
+      todoListEl.innerHTML = '<div class="empty-note">할일이 없습니다.</div>';
       return;
     }
     if(list.length === 0){
-      todoListEl.innerHTML = '<div class="empty-note">議곌굔??留욌뒗 ???쇱씠 ?놁뒿?덈떎.</div>';
+      todoListEl.innerHTML = '<div class="empty-note">조건에 맞는 할일이 없습니다.</div>';
       return;
     }
     todoListEl.innerHTML = '';
@@ -1112,10 +1196,10 @@
       var meta = document.createElement('div');
       meta.className = 'todo-meta';
       var metaBits = [];
-      if(t.due_date) metaBits.push('留덇컧 ' + t.due_date);
-      metaBits.push('?곗꽑?쒖쐞 ' + t.priority);
-      metaBits.push(t.estimated_minutes + '遺?);
-      meta.textContent = metaBits.join(' 쨌 ');
+      if(t.due_date) metaBits.push('마감 ' + t.due_date);
+      metaBits.push('우선순위 ' + t.priority);
+      metaBits.push(t.estimated_minutes + '분');
+      meta.textContent = metaBits.join(' · ');
 
       var tagsEl = document.createElement('div');
       tagsEl.className = 'todo-tags';
@@ -1128,12 +1212,12 @@
       var actions = document.createElement('div');
       actions.className = 'todo-actions';
       var editBtn = document.createElement('button');
-      editBtn.type = 'button'; editBtn.textContent = '?섏젙';
+      editBtn.type = 'button'; editBtn.textContent = '수정';
       editBtn.addEventListener('click', function(){ loadTodoIntoForm(t); });
       var delBtn = document.createElement('button');
-      delBtn.type = 'button'; delBtn.textContent = '??젣';
+      delBtn.type = 'button'; delBtn.textContent = '삭제';
       delBtn.addEventListener('click', function(){
-        if(confirm('?????쇱쓣 吏?멸퉴??')) deleteTodo(t);
+        if(confirm('할일을 지울까요?')) deleteTodo(t);
       });
       actions.appendChild(editBtn);
       actions.appendChild(delBtn);
@@ -1154,10 +1238,10 @@
   todoSortEl.addEventListener('change', renderTodoList);
 
   async function loadTodosAndRender(){
-    todoListEl.innerHTML = '<div class="empty-note">遺덈윭?ㅻ뒗 以?..</div>';
+    todoListEl.innerHTML = '<div class="empty-note">불러오는 중...</div>';
     var res = await sb.from('todos').select('*').eq('is_deleted', false).order('created_at', { ascending:false });
     if(res.error){
-      todoListEl.innerHTML = '<div class="empty-note">??紐⑸줉??遺덈윭?ㅼ? 紐삵뻽?듬땲?? ' + res.error.message + '</div>';
+      todoListEl.innerHTML = '<div class="empty-note">할일 목록을 불러오지 못했습니다: ' + res.error.message + '</div>';
       currentTodos = [];
       return;
     }
@@ -1174,11 +1258,11 @@
     var planId = planRes.data[0].id;
 
     var seeds = [
-      { title:'?⑥씠??- ?곸껜', content:'踰ㅼ튂?꾨젅?? ?ロ??ㅼ슫, ?꾨뜑?꾨젅??, due_date: todayISO(2), priority:'?믪쓬', tags:['洹쇰젰'], estimated_minutes:60 },
-      { title:'?⑥씠??- ?섏껜', content:'?ㅼ옘?? ?덇렇?꾨젅?? ?곗?', due_date: todayISO(4), priority:'?믪쓬', tags:['洹쇰젰'], estimated_minutes:60 },
-      { title:'?좎궛??- ?щ떇 5km', content:'?섏씠??6遺?km 紐⑺몴', due_date: todayISO(1), priority:'以묎컙', tags:['?좎궛??], estimated_minutes:30 },
-      { title:'?좎궛??- ?ъ씠??, content:'?ㅻ궡 ?먯쟾嫄?30遺?, due_date: todayISO(3), priority:'以묎컙', tags:['?좎궛??], estimated_minutes:30 },
-      { title:'?ㅽ듃?덉묶 - ?꾩떊', content:'?대룞 ?꾪썑 ?ㅽ듃?덉묶', due_date: todayISO(5), priority:'??쓬', tags:['?뚮났'], estimated_minutes:20 }
+      { title:'운동 - 상체', content:'벤치프레스, 랫풀다운, 숄더프레스', due_date: todayISO(2), priority:'높음', tags:['근력'], estimated_minutes:60 },
+      { title:'운동 - 하체', content:'스쿼트, 레그프레스, 런지', due_date: todayISO(4), priority:'높음', tags:['근력'], estimated_minutes:60 },
+      { title:'유산소 - 러닝 5km', content:'페이스 6분/km 목표', due_date: todayISO(1), priority:'중간', tags:['유산소'], estimated_minutes:30 },
+      { title:'유산소 - 사이클', content:'실내 자전거 30분', due_date: todayISO(3), priority:'중간', tags:['유산소'], estimated_minutes:30 },
+      { title:'스트레칭 - 전신', content:'운동 전후 스트레칭', due_date: todayISO(5), priority:'낮음', tags:['회복'], estimated_minutes:20 }
     ];
     for(var i=0;i<seeds.length;i++){
       var s = seeds[i];
@@ -1187,7 +1271,7 @@
     }
   }
 
-  /* ================= ?ㅽ뻾 湲곕줉 (移대뱶3, Do) ================= */
+  /* ================= 실행 기록 (Do) ================= */
   var runForm = document.getElementById('run-form');
   var runTodoSelect = document.getElementById('run-todo-select');
   var runStart = document.getElementById('run-start');
@@ -1199,7 +1283,7 @@
 
   function todoTitleById(id){
     var t = currentTodos.find(function(x){ return x.id === id; });
-    return t ? t.title : '(??젣??????';
+    return t ? t.title : '(삭제된 할일)';
   }
 
   function populateRunTodoSelect(){
@@ -1208,7 +1292,7 @@
     currentTodos.forEach(function(t){
       var opt = document.createElement('option');
       opt.value = t.id;
-      opt.textContent = t.title + (t.status==='done' ? ' (?꾨즺)' : '');
+      opt.textContent = t.title + (t.status==='done' ? ' (완료)' : '');
       runTodoSelect.appendChild(opt);
     });
     if(prev && currentTodos.some(function(t){ return t.id === prev; })){
@@ -1224,13 +1308,13 @@
   runForm.addEventListener('submit', async function(e){
     e.preventDefault();
     if(!runTodoSelect.value){
-      setRunStatus('??癒쇱? ???쇱쓣 ?섎굹 ?댁긽 留뚮뱾?댁＜?몄슂', true);
+      setRunStatus('먼저 할일을 하나 이상 만들어주세요.', true);
       return;
     }
     var start = new Date(runStart.value);
     var end = new Date(runEnd.value);
     if(!(end > start)){
-      setRunStatus('???앸궃 ?쒓컖???쒖옉 ?쒓컖蹂대떎 ??뼱???⑸땲??, true);
+      setRunStatus('끝난 시각은 시작 시각보다 늦어야 합니다.', true);
       return;
     }
     var actualMinutes = Math.round((end - start) / 60000);
@@ -1242,14 +1326,14 @@
       blocked_reason: runBlocked.value.trim() || null
     };
     document.getElementById('run-btn-save').disabled = true;
-    setRunStatus('??ν븯??以?..');
+    setRunStatus('저장하는 중...');
     var result = await sb.from('run_logs').insert(payload);
     document.getElementById('run-btn-save').disabled = false;
     if(result.error){
-      setRunStatus('??????ㅽ뙣: ' + result.error.message, true);
+      setRunStatus('저장 실패: ' + result.error.message, true);
       return;
     }
-    setRunStatus('?ㅽ뻾 湲곕줉????λ릱?듬땲??(' + actualMinutes + '遺?');
+    setRunStatus('실행 기록이 저장되었습니다. (' + actualMinutes + '분)');
     runForm.reset();
     await loadRunLogsAndRender();
     renderSeeStats();
@@ -1257,7 +1341,7 @@
 
   function renderRunList(){
     if(currentRunLogs.length === 0){
-      runListEl.innerHTML = '<div class="empty-note">?ㅽ뻾 湲곕줉???놁뒿?덈떎.</div>';
+      runListEl.innerHTML = '<div class="empty-note">실행 기록이 없습니다.</div>';
       return;
     }
     runListEl.innerHTML = '';
@@ -1271,13 +1355,13 @@
       meta.className = 'run-meta';
       var s = new Date(r.started_at).toLocaleString('ko-KR');
       var e = new Date(r.ended_at).toLocaleString('ko-KR');
-      meta.textContent = s + ' ~ ' + e + ' 쨌 ?ㅼ젣 ' + r.actual_minutes + '遺?;
+      meta.textContent = s + ' ~ ' + e + ' · 실제 ' + r.actual_minutes + '분';
       entry.appendChild(title);
       entry.appendChild(meta);
       if(r.blocked_reason){
         var blocked = document.createElement('div');
         blocked.className = 'run-blocked';
-        blocked.textContent = '留됲옒: ' + r.blocked_reason;
+        blocked.textContent = '막힘: ' + r.blocked_reason;
         entry.appendChild(blocked);
       }
       runListEl.appendChild(entry);
@@ -1285,10 +1369,10 @@
   }
 
   async function loadRunLogsAndRender(){
-    runListEl.innerHTML = '<div class="empty-note">遺덈윭?ㅻ뒗 以?..</div>';
+    runListEl.innerHTML = '<div class="empty-note">불러오는 중...</div>';
     var res = await sb.from('run_logs').select('*').order('started_at', { ascending:false });
     if(res.error){
-      runListEl.innerHTML = '<div class="empty-note">??紐⑸줉??遺덈윭?ㅼ? 紐삵뻽?듬땲?? ' + res.error.message + '</div>';
+      runListEl.innerHTML = '<div class="empty-note">실행 기록을 불러오지 못했습니다: ' + res.error.message + '</div>';
       currentRunLogs = [];
       return;
     }
@@ -1312,7 +1396,7 @@
     return seoul.getFullYear() + '-' + pad2(seoul.getMonth()+1) + '-' + pad2(seoul.getDate());
   }
 
-  /* ================= ?뚯븘蹂닿린 (移대뱶4, See) ================= */
+  /* ================= 돌아보기 (See) ================= */
   var seePlanSelect = document.getElementById('see-plan-select');
   var seeStatsEl = document.getElementById('see-stats');
   var seeNote = document.getElementById('see-note');
@@ -1349,7 +1433,7 @@
 
   function renderSeeStats(){
     if(!seePlanSelect.value){
-      seeStatsEl.innerHTML = '<div class="empty-note">癒쇱? 怨꾪쉷???섎굹 ??ν빐二쇱꽭??</div>';
+      seeStatsEl.innerHTML = '<div class="empty-note">먼저 계획을 하나 저장해주세요.</div>';
       return;
     }
     var planId = seePlanSelect.value;
@@ -1373,15 +1457,15 @@
 
     seeStatsEl.innerHTML =
       '<div class="stat-grid">' +
-        '<div class="stat-box"><div class="stat-label">怨꾪쉷 ??(吏?곗? ?딆? ????</div><div class="stat-num" id="stat-plan">'+planCount+'</div></div>' +
-        '<div class="stat-box"><div class="stat-label">?꾨즺 ??/div><div class="stat-num" id="stat-done">'+doneCount+'</div></div>' +
-        '<div class="stat-box"><div class="stat-label">吏????/div><div class="stat-num" id="stat-overdue">'+overdueCount+'</div></div>' +
-        '<div class="stat-box"><div class="stat-label">留됲옒 ??/div><div class="stat-num" id="stat-blocked">'+blockedCount+'</div></div>' +
+        '<div class="stat-box"><div class="stat-label">계획 수 (지운 것 안 포함)</div><div class="stat-num" id="stat-plan">'+planCount+'</div></div>' +
+        '<div class="stat-box"><div class="stat-label">완료 수</div><div class="stat-num" id="stat-done">'+doneCount+'</div></div>' +
+        '<div class="stat-box"><div class="stat-label">지연 수</div><div class="stat-num" id="stat-overdue">'+overdueCount+'</div></div>' +
+        '<div class="stat-box"><div class="stat-label">막힘 수</div><div class="stat-num" id="stat-blocked">'+blockedCount+'</div></div>' +
       '</div>' +
       '<div class="time-compare">' +
-        '?덉긽 ?쒓컙 ?⑷퀎: <b>'+estSum+'遺?/b><br>' +
-        '?ㅼ젣 ?쒓컙 ?⑷퀎: <b>'+actualSum+'遺?/b><br>' +
-        '李⑥씠(?ㅼ젣-?덉긽): <b>'+(diff>=0?'+':'')+diff+'遺?/b>' +
+        '예상 시간 합계: <b>'+estSum+'분</b><br>' +
+        '실제 시간 합계: <b>'+actualSum+'분</b><br>' +
+        '차이(실제-예상): <b>'+(diff>=0?'+':'')+diff+'분</b>' +
       '</div>';
 
     document.getElementById('stat-plan').addEventListener('click', function(){ jumpToTodos(planId, 'all'); });
@@ -1393,23 +1477,23 @@
   seeCarryBtn.addEventListener('click', function(){
     var note = seeNote.value.trim();
     if(!note){
-      seeCarryStatus.textContent = '??癒쇱? 怨좎튌 ?먯쓣 ??以??곸뼱二쇱꽭??;
+      seeCarryStatus.textContent = '먼저 고칠 점을 한 줄 적어주세요.';
       seeCarryStatus.className = 'err';
       return;
     }
     resetFormToNew();
-    successCriteria.value = '[?뚯븘蹂닿린 諛섏쁺] ' + note;
+    successCriteria.value = '[돌아보기 반영] ' + note;
     seeCarryStatus.textContent = '';
     showSheet(SHEETS.indexOf('sheet-plan'));
   });
 
-  /* ================= ?꾩껜 ?먮즺 ?대낫?닿린 (移대뱶5) ================= */
+  /* ================= 전체 자료 내보내기 ================= */
   var exportBtn = document.getElementById('export-btn');
   var exportStatus = document.getElementById('export-status');
 
   exportBtn.addEventListener('click', async function(){
     exportBtn.disabled = true;
-    exportStatus.textContent = '?먮즺瑜?紐⑥쑝??以?..';
+    exportStatus.textContent = '자료를 모으는 중...';
     try{
       var revRes = await sb.from('plan_revisions').select('*').order('revised_at', { ascending:false });
       var payload = {
@@ -1429,9 +1513,9 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      exportStatus.textContent = '?대낫?닿린 ?꾨즺';
+      exportStatus.textContent = '내보내기 완료';
     } catch(err){
-      exportStatus.textContent = '???대낫?닿린 ?ㅽ뙣: ' + err.message;
+      exportStatus.textContent = '내보내기 실패: ' + err.message;
     }
     exportBtn.disabled = false;
   });
@@ -1455,76 +1539,6 @@
   }
 
 })();
-</script>
-<script>
-  (function() {
-    var SUPABASE_URL = 'https://kdlnzkdltpccimhnbvdz.supabase.co';
-    var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkbG56a2RsdHBjY2ltaG5idmR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MzU4ODcsImV4cCI6MjEwNTAxMTg4N30._iv7SyzGqQWtlyRoZNgAuIVqMF8O0EpKNZBRmXHfPvs';
-    var sb2 = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    var authScreen = document.getElementById('auth-screen');
-    var coverScreen = document.getElementById('cover-screen');
-    var appRoot = document.getElementById('app-root');
-
-    function switchTab(tab) {
-      document.getElementById('form-login').style.display = tab === 'login' ? '' : 'none';
-      document.getElementById('form-signup').style.display = tab === 'signup' ? '' : 'none';
-      document.getElementById('tab-login').style.cssText = tab === 'login'
-        ? 'flex:1;padding:10px;text-align:center;cursor:pointer;font-size:14px;color:#4f46e5;border-bottom:2px solid #4f46e5;font-weight:600;margin-bottom:-2px;'
-        : 'flex:1;padding:10px;text-align:center;cursor:pointer;font-size:14px;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;';
-      document.getElementById('tab-signup').style.cssText = tab === 'signup'
-        ? 'flex:1;padding:10px;text-align:center;cursor:pointer;font-size:14px;color:#4f46e5;border-bottom:2px solid #4f46e5;font-weight:600;margin-bottom:-2px;'
-        : 'flex:1;padding:10px;text-align:center;cursor:pointer;font-size:14px;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;';
-      document.getElementById('auth-error').style.display = 'none';
-    }
-    window.switchTab = switchTab;
-
-    function showError(msg) {
-      var el = document.getElementById('auth-error');
-      el.textContent = msg;
-      el.style.display = 'block';
-    }
-
-    window.handleLogin = async function() {
-      var email = document.getElementById('login-email').value.trim();
-      var password = document.getElementById('login-password').value;
-      if (!email || !password) { showError('이메일과 비밀번호를 입력해주세요.'); return; }
-      var result = await sb2.auth.signInWithPassword({ email: email, password: password });
-      if (result.error) { showError('이메일 또는 비밀번호를 확인해주세요.'); return; }
-    };
-
-    window.handleSignup = async function() {
-      var email = document.getElementById('signup-email').value.trim();
-      var password = document.getElementById('signup-password').value;
-      var password2 = document.getElementById('signup-password2').value;
-      if (!email || !password) { showError('이메일과 비밀번호를 입력해주세요.'); return; }
-      if (password !== password2) { showError('비밀번호가 일치하지 않습니다.'); return; }
-      if (password.length < 6) { showError('비밀번호는 6자 이상이어야 합니다.'); return; }
-      var result = await sb2.auth.signUp({ email: email, password: password });
-      if (result.error) {
-        if (result.error.message.includes('already registered')) {
-          showError('이미 가입된 이메일입니다.');
-        } else {
-          showError('가입 중 오류가 발생했습니다: ' + result.error.message);
-        }
-        return;
-      }
-      alert('가입 완료! 로그인해주세요.');
-      switchTab('login');
-    };
-
-    sb2.auth.onAuthStateChange(function(event, session) {
-      if (session) {
-        authScreen.style.display = 'none';
-        coverScreen.style.display = 'flex';
-        appRoot.style.display = '';
-      } else {
-        authScreen.style.display = 'flex';
-        coverScreen.style.display = 'none';
-        appRoot.style.display = 'none';
-      }
-    });
-  })();
 </script>
 </body>
 </html>
