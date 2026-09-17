@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>?�랜?�씨 ?�이?�리</title>
+<title>?뚮옖?먯뵪 ?ㅼ씠?대━</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Alex+Brush&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -36,7 +36,7 @@
 
   .title-font{ font-family: 'Alex Brush', cursive; }
 
-  /* ---------- ?�힌 ?��? ---------- */
+  /* ---------- ?ロ엺 ?쒖? ---------- */
   #cover-screen{
     width: var(--page-w);
     height: var(--book-h);
@@ -110,7 +110,7 @@
     border-radius: 4px;
   }
 
-  /* 중앙 ?�본??- ?�?�??명암�? ?�프�?그래???�음 */
+  /* 以묒븰 ?쒕낯??- ????紐낆븫留? ?ㅽ봽留?洹몃옒???놁쓬 */
   .spine{
     position:absolute;
     left:50%; top:0; bottom:0;
@@ -144,7 +144,7 @@
   .page:first-child{ border-radius: 4px 0 0 4px; padding-right: 30px; }
   .page:last-child{ border-radius: 0 4px 4px 0; padding-left: 30px; }
 
-  /* ---------- ?�트(?�이지 ?��?) ---------- */
+  /* ---------- ?쒗듃(?섏씠吏 ?섍?) ---------- */
   .sheet{ min-height: 0; }
   .page-num{
     position:absolute; top: 14px; right: 20px;
@@ -313,13 +313,13 @@
   }
   .todo-entry .todo-actions button:hover{ color: var(--accent-green); }
 
-  /* ---------- ?�행 기록 (Do) ---------- */
+  /* ---------- ?ㅽ뻾 湲곕줉 (Do) ---------- */
   .run-entry{ padding: 9px 0; border-bottom: 1px dashed rgba(50,46,41,0.14); font-size: 12.5px; }
   .run-entry .run-todo{ font-weight:700; margin-bottom:2px; }
   .run-entry .run-meta{ color: var(--ink-soft); line-height:1.6; }
   .run-entry .run-blocked{ color: var(--title-red); margin-top:2px; }
 
-  /* ---------- ?�아보기 (See) ---------- */
+  /* ---------- ?뚯븘蹂닿린 (See) ---------- */
   .stat-grid{
     display:grid; grid-template-columns: 1fr 1fr; gap: 10px;
     margin: 10px 0 16px;
@@ -364,26 +364,26 @@
 </style>
 </head>
 <body>
-<!-- ���� ȭ�� -->
+<!-- 인증 화면 -->
 <div id="auth-screen" style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#f5f5f5;">
   <div style="background:white;padding:40px;border-radius:12px;box-shadow:0 2px 16px rgba(0,0,0,0.1);width:360px;">
-    <h1 style="font-size:22px;margin-bottom:8px;">�÷��ξ� ���̾</h1>
-    <p style="color:#888;font-size:14px;margin-bottom:24px;">�α����ϰ� ������ ����� �����ϼ���</p>
+    <h1 style="font-size:22px;margin-bottom:8px;">플랜두씨 다이어리</h1>
+    <p style="color:#888;font-size:14px;margin-bottom:24px;">로그인하고 나만의 기록을 시작하세요</p>
     <div style="display:flex;margin-bottom:24px;border-bottom:2px solid #eee;">
-      <div id="tab-login" onclick="switchTab('login')" style="flex:1;padding:10px;text-align:center;cursor:pointer;font-size:14px;color:#4f46e5;border-bottom:2px solid #4f46e5;font-weight:600;margin-bottom:-2px;">�α���</div>
-      <div id="tab-signup" onclick="switchTab('signup')" style="flex:1;padding:10px;text-align:center;cursor:pointer;font-size:14px;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;">����</div>
+      <div id="tab-login" onclick="switchTab('login')" style="flex:1;padding:10px;text-align:center;cursor:pointer;font-size:14px;color:#4f46e5;border-bottom:2px solid #4f46e5;font-weight:600;margin-bottom:-2px;">로그인</div>
+      <div id="tab-signup" onclick="switchTab('signup')" style="flex:1;padding:10px;text-align:center;cursor:pointer;font-size:14px;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;">가입</div>
     </div>
     <div id="auth-error" style="display:none;background:#fef2f2;color:#dc2626;padding:10px 12px;border-radius:8px;font-size:13px;margin-bottom:16px;"></div>
     <div id="form-login">
-      <div style="margin-bottom:16px;"><label style="display:block;font-size:13px;margin-bottom:6px;color:#555;">�̸���</label><input type="email" id="login-email" placeholder="example@email.com" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box;" /></div>
-      <div style="margin-bottom:16px;"><label style="display:block;font-size:13px;margin-bottom:6px;color:#555;">��й�ȣ</label><input type="password" id="login-password" placeholder="��й�ȣ �Է�" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box;" /></div>
-      <button onclick="window.handleLogin()" style="width:100%;padding:12px;background:#4f46e5;color:white;border:none;border-radius:8px;font-size:15px;cursor:pointer;font-weight:600;">�α���</button>
+      <div style="margin-bottom:16px;"><label style="display:block;font-size:13px;margin-bottom:6px;color:#555;">이메일</label><input type="email" id="login-email" placeholder="example@email.com" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box;" /></div>
+      <div style="margin-bottom:16px;"><label style="display:block;font-size:13px;margin-bottom:6px;color:#555;">비밀번호</label><input type="password" id="login-password" placeholder="비밀번호 입력" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box;" /></div>
+      <button onclick="handleLogin()" style="width:100%;padding:12px;background:#4f46e5;color:white;border:none;border-radius:8px;font-size:15px;cursor:pointer;font-weight:600;">로그인</button>
     </div>
     <div id="form-signup" style="display:none;">
-      <div style="margin-bottom:16px;"><label style="display:block;font-size:13px;margin-bottom:6px;color:#555;">�̸���</label><input type="email" id="signup-email" placeholder="example@email.com" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box;" /></div>
-      <div style="margin-bottom:16px;"><label style="display:block;font-size:13px;margin-bottom:6px;color:#555;">��й�ȣ (6�� �̻�)</label><input type="password" id="signup-password" placeholder="��й�ȣ �Է�" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box;" /></div>
-      <div style="margin-bottom:16px;"><label style="display:block;font-size:13px;margin-bottom:6px;color:#555;">��й�ȣ Ȯ��</label><input type="password" id="signup-password2" placeholder="��й�ȣ ���Է�" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box;" /></div>
-      <button onclick="window.handleSignup()" style="width:100%;padding:12px;background:#4f46e5;color:white;border:none;border-radius:8px;font-size:15px;cursor:pointer;font-weight:600;">�����ϱ�</button>
+      <div style="margin-bottom:16px;"><label style="display:block;font-size:13px;margin-bottom:6px;color:#555;">이메일</label><input type="email" id="signup-email" placeholder="example@email.com" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box;" /></div>
+      <div style="margin-bottom:16px;"><label style="display:block;font-size:13px;margin-bottom:6px;color:#555;">비밀번호 (6자 이상)</label><input type="password" id="signup-password" placeholder="비밀번호 입력" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box;" /></div>
+      <div style="margin-bottom:16px;"><label style="display:block;font-size:13px;margin-bottom:6px;color:#555;">비밀번호 확인</label><input type="password" id="signup-password2" placeholder="비밀번호 재입력" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;box-sizing:border-box;" /></div>
+      <button onclick="handleSignup()" style="width:100%;padding:12px;background:#4f46e5;color:white;border:none;border-radius:8px;font-size:15px;cursor:pointer;font-weight:600;">가입하기</button>
     </div>
   </div>
 </div>
@@ -395,14 +395,14 @@
 
 <div id="app-root">
   <div class="diary-spread">
-    <div class="close-tab" id="close-tab">?�이?�리 ??��</div>
+    <div class="close-tab" id="close-tab">?ㅼ씠?대━ ??린</div>
     <div class="spine"></div>
 
     <div class="page page-left">
       <h1 class="brand-mark"><span class="brand-caps">PLANDOSEE</span><span class="brand-script">Diary</span></h1>
-      <p class="subhead">계획 ???�제�????????�아보기</p>
-      <p class="tagline">?�벽?��? ?�아??괜찮?�요, 계속 ?�는 �?중요?�요</p>
-      <div class="notice">지금�? 로그?�이 ?�어 링크�??�는 ?�람?� ?�구??�????�습?�다. ?�이 봐도 괜찮?� ?�용�??�으?�요.</div>
+      <p class="subhead">怨꾪쉷 ???ㅼ젣濡????????뚯븘蹂닿린</p>
+      <p class="tagline">?꾨꼍?섏? ?딆븘??愿쒖갖?꾩슂, 怨꾩냽 ?곕뒗 寃?以묒슂?댁슂</p>
+      <div class="notice">吏湲덉? 濡쒓렇?몄씠 ?놁뼱 留곹겕瑜??꾨뒗 ?щ엺? ?꾧뎄??蹂????덉뒿?덈떎. ?⑥씠 遊먮룄 愿쒖갖? ?댁슜留??ｌ쑝?몄슂.</div>
 
       <h2 class="section-title">Calendar</h2>
       <div class="cal-head">
@@ -411,13 +411,13 @@
         <button type="button" id="cal-next">??/button>
       </div>
       <table class="cal-grid">
-        <thead><tr><th>??/th><th>??/th><th>??/th><th>??/th><th>�?/th><th>�?/th><th>??/th></tr></thead>
+        <thead><tr><th>??/th><th>??/th><th>??/th><th>??/th><th>紐?/th><th>湲?/th><th>??/th></tr></thead>
         <tbody id="cal-body"></tbody>
       </table>
-      <div class="cal-legend"><span class="swatch"></span> 계획 기간</div>
+      <div class="cal-legend"><span class="swatch"></span> 怨꾪쉷 湲곌컙</div>
 
       <div class="page-turn prev" id="page-turn-prev"></div>
-      <div class="page-turn-label prev" id="page-turn-prev-label">?�전?�으�?/div>
+      <div class="page-turn-label prev" id="page-turn-prev-label">?댁쟾?μ쑝濡?/div>
     </div>
 
     <div class="page page-right">
@@ -428,7 +428,7 @@
 
       <form id="plan-form">
         <div class="field-row">
-          <label>기간</label>
+          <label>湲곌컙</label>
           <div class="period-row">
             <input type="date" id="period-start" required>
             <span>~</span>
@@ -437,36 +437,36 @@
         </div>
 
         <div class="field-row">
-          <label>?�선?�위</label>
+          <label>?곗꽑?쒖쐞</label>
           <div class="priority-options">
-            <label><input type="radio" name="priority" value="?�음" checked><span>?�음</span></label>
-            <label><input type="radio" name="priority" value="중간"><span>중간</span></label>
-            <label><input type="radio" name="priority" value="??��"><span>??��</span></label>
+            <label><input type="radio" name="priority" value="?믪쓬" checked><span>?믪쓬</span></label>
+            <label><input type="radio" name="priority" value="以묎컙"><span>以묎컙</span></label>
+            <label><input type="radio" name="priority" value="??쓬"><span>??쓬</span></label>
           </div>
         </div>
 
         <div class="field-row">
-          <label>?�공 기�?</label>
-          <textarea id="success-criteria" placeholder="?? �?3???�상, ?�이??40�?+ ?�산??20�? required></textarea>
+          <label>?깃났 湲곗?</label>
+          <textarea id="success-criteria" placeholder="?? 二?3???댁긽, ?⑥씠??40遺?+ ?좎궛??20遺? required></textarea>
         </div>
 
         <div class="field-row">
-          <label>?�상 ?�간</label>
+          <label>?덉긽 ?쒓컙</label>
           <div class="est-row">
             <input type="number" id="estimated-minutes" min="0" required>
-            <span>�?/span>
+            <span>遺?/span>
           </div>
         </div>
 
         <div class="form-actions">
-          <button type="button" class="btn-cancel" id="btn-cancel">?�정 취소</button>
-          <button type="submit" class="btn-save" id="btn-save">계획 ?�??/button>
+          <button type="button" class="btn-cancel" id="btn-cancel">?섏젙 痍⑥냼</button>
+          <button type="submit" class="btn-save" id="btn-save">怨꾪쉷 ???/button>
         </div>
         <div id="save-status"></div>
       </form>
 
       <h2 class="section-title">Saved Plans</h2>
-      <div id="plan-list"><div class="empty-note">불러?�는 �?..</div></div>
+      <div id="plan-list"><div class="empty-note">遺덈윭?ㅻ뒗 以?..</div></div>
       </div><!-- /sheet-plan -->
 
       <div class="sheet" id="sheet-todo" style="display:none;">
@@ -474,69 +474,69 @@
 
       <form id="todo-form">
         <div class="field-row">
-          <label>?????�이 ?�린 계획</label>
+          <label>?????쇱씠 ?몃┛ 怨꾪쉷</label>
           <select id="todo-plan-select" required></select>
         </div>
         <div class="field-row">
-          <label>?�목</label>
+          <label>?쒕ぉ</label>
           <input type="text" id="todo-title" required>
         </div>
         <div class="field-row">
-          <label>?�용</label>
-          <textarea id="todo-content" placeholder="구체?�으�?�??��?"></textarea>
+          <label>?댁슜</label>
+          <textarea id="todo-content" placeholder="援ъ껜?곸쑝濡?萸??좎?"></textarea>
         </div>
         <div class="field-row">
           <div class="period-row">
             <div style="flex:1;">
-              <label>마감??/label>
+              <label>留덇컧??/label>
               <input type="date" id="todo-due">
             </div>
             <div style="flex:1;">
-              <label>?�상 ?�간</label>
-              <input type="number" id="todo-estimated" min="0" placeholder="�?>
+              <label>?덉긽 ?쒓컙</label>
+              <input type="number" id="todo-estimated" min="0" placeholder="遺?>
             </div>
           </div>
         </div>
         <div class="field-row">
-          <label>?�선?�위</label>
+          <label>?곗꽑?쒖쐞</label>
           <div class="priority-options">
-            <label><input type="radio" name="todo-priority" value="?�음" checked><span>?�음</span></label>
-            <label><input type="radio" name="todo-priority" value="중간"><span>중간</span></label>
-            <label><input type="radio" name="todo-priority" value="??��"><span>??��</span></label>
+            <label><input type="radio" name="todo-priority" value="?믪쓬" checked><span>?믪쓬</span></label>
+            <label><input type="radio" name="todo-priority" value="以묎컙"><span>以묎컙</span></label>
+            <label><input type="radio" name="todo-priority" value="??쓬"><span>??쓬</span></label>
           </div>
         </div>
         <div class="field-row">
-          <label>?�그 (?�표�?구분, ?? 근력,?�침)</label>
-          <input type="text" id="todo-tags" placeholder="근력, ?�침">
+          <label>?쒓렇 (?쇳몴濡?援щ텇, ?? 洹쇰젰,?꾩묠)</label>
+          <input type="text" id="todo-tags" placeholder="洹쇰젰, ?꾩묠">
         </div>
         <div class="form-actions">
-          <button type="button" class="btn-cancel" id="todo-btn-cancel">?�정 취소</button>
-          <button type="submit" class="btn-save" id="todo-btn-save">?????�??/button>
+          <button type="button" class="btn-cancel" id="todo-btn-cancel">?섏젙 痍⑥냼</button>
+          <button type="submit" class="btn-save" id="todo-btn-save">???????/button>
         </div>
         <div id="todo-save-status"></div>
       </form>
 
       <div class="todo-controls">
-        <input type="text" id="todo-search" placeholder="검??(?�목·?�용)">
+        <input type="text" id="todo-search" placeholder="寃??(?쒕ぉ쨌?댁슜)">
         <select id="todo-filter-status">
-          <option value="all">?�체</option>
-          <option value="in_progress">진행�?/option>
-          <option value="done">?�료</option>
+          <option value="all">?꾩껜</option>
+          <option value="in_progress">吏꾪뻾以?/option>
+          <option value="done">?꾨즺</option>
         </select>
         <select id="todo-sort">
-          <option value="due_asc">마감??빠른??/option>
-          <option value="priority">?�선?�위??(?�음?�낮??</option>
-          <option value="estimated_desc">?�상?�간 많�???/option>
+          <option value="due_asc">留덇컧??鍮좊Ⅸ??/option>
+          <option value="priority">?곗꽑?쒖쐞??(?믪쓬?믩궙??</option>
+          <option value="estimated_desc">?덉긽?쒓컙 留롮???/option>
         </select>
       </div>
       <div class="sort-label" id="todo-sort-label"></div>
 
       <div class="drill-banner" id="drill-banner" style="display:none;">
         <span id="drill-banner-text"></span>
-        <button type="button" id="drill-clear">?�터 초기??/button>
+        <button type="button" id="drill-clear">?꾪꽣 珥덇린??/button>
       </div>
 
-      <div id="todo-list"><div class="empty-note">불러?�는 �?..</div></div>
+      <div id="todo-list"><div class="empty-note">遺덈윭?ㅻ뒗 以?..</div></div>
       </div><!-- /sheet-todo -->
 
       <div class="sheet" id="sheet-do" style="display:none;">
@@ -544,64 +544,64 @@
 
       <form id="run-form">
         <div class="field-row">
-          <label>?�느 ???�을 ?�나??/label>
+          <label>?대뒓 ???쇱쓣 ?덈굹??/label>
           <select id="run-todo-select" required></select>
         </div>
         <div class="field-row">
           <div class="period-row">
             <div style="flex:1;">
-              <label>?�작 ?�각</label>
+              <label>?쒖옉 ?쒓컖</label>
               <input type="datetime-local" id="run-start" required>
             </div>
             <div style="flex:1;">
-              <label>?�난 ?�각</label>
+              <label>?앸궃 ?쒓컖</label>
               <input type="datetime-local" id="run-end" required>
             </div>
           </div>
         </div>
         <div class="field-row">
-          <label>막혔???�유 (?�으�?비워?�세??</label>
-          <input type="text" id="run-blocked" placeholder="?? 비�? ?�??�??�감">
+          <label>留됲삍???댁쑀 (?놁쑝硫?鍮꾩썙?먯꽭??</label>
+          <input type="text" id="run-blocked" placeholder="?? 鍮꾧? ???紐??섍컧">
         </div>
         <div class="form-actions">
-          <button type="submit" class="btn-save" id="run-btn-save">?�행 기록 ?�??/button>
+          <button type="submit" class="btn-save" id="run-btn-save">?ㅽ뻾 湲곕줉 ???/button>
         </div>
         <div id="run-save-status"></div>
       </form>
 
       <h2 class="section-title">Log</h2>
-      <div id="run-list"><div class="empty-note">불러?�는 �?..</div></div>
+      <div id="run-list"><div class="empty-note">遺덈윭?ㅻ뒗 以?..</div></div>
       </div><!-- /sheet-do -->
 
       <div class="sheet" id="sheet-see" style="display:none;">
       <h2 class="section-title" style="margin-top:0;">See</h2>
 
       <div class="field-row">
-        <label>?�느 계획???�아볼까??/label>
+        <label>?대뒓 怨꾪쉷???뚯븘蹂쇨퉴??/label>
         <select id="see-plan-select"></select>
       </div>
 
-      <div id="see-stats"><div class="empty-note">불러?�는 �?..</div></div>
+      <div id="see-stats"><div class="empty-note">遺덈윭?ㅻ뒗 以?..</div></div>
 
       <h2 class="section-title">Next</h2>
       <div class="field-row">
-        <label>?�번???�아보고 고칠 ????�?/label>
-        <textarea id="see-note" placeholder="?? ?�???�속????��???�전 ?�동?�로 바꾸??></textarea>
+        <label>?대쾲???뚯븘蹂닿퀬 怨좎튌 ????以?/label>
+        <textarea id="see-note" placeholder="?? ????쎌냽????븘???ㅼ쟾 ?대룞?쇰줈 諛붽씀??></textarea>
       </div>
       <div class="form-actions">
-        <button type="button" class="btn-save" id="see-carry-btn">?�음 계획??반영?�기</button>
+        <button type="button" class="btn-save" id="see-carry-btn">?ㅼ쓬 怨꾪쉷??諛섏쁺?섍린</button>
       </div>
       <div id="see-carry-status"></div>
 
       <h2 class="section-title">Export</h2>
       <div class="form-actions" style="justify-content:flex-start;">
-        <button type="button" class="btn-save" id="export-btn">?�체 ?�료 ?�보?�기 (JSON)</button>
+        <button type="button" class="btn-save" id="export-btn">?꾩껜 ?먮즺 ?대낫?닿린 (JSON)</button>
       </div>
       <div id="export-status"></div>
       </div><!-- /sheet-see -->
 
       <div class="page-turn next" id="page-turn-next"></div>
-      <div class="page-turn-label next" id="page-turn-next-label">?�음?�으�?/div>
+      <div class="page-turn-label next" id="page-turn-next-label">?ㅼ쓬?μ쑝濡?/div>
     </div>
   </div>
 </div>
@@ -631,13 +631,13 @@
     coverScreen.style.display = 'flex';
   });
 
-  /* ---------- ?�트(?�이지 ?��?) ---------- */
+  /* ---------- ?쒗듃(?섏씠吏 ?섍?) ---------- */
   var SHEETS = ['sheet-plan', 'sheet-todo', 'sheet-do', 'sheet-see'];
   var SHEET_LABELS = {
-    'sheet-plan':'1 / 4 · Plan',
-    'sheet-todo':'2 / 4 · Todo',
-    'sheet-do':'3 / 4 · Do',
-    'sheet-see':'4 / 4 · See'
+    'sheet-plan':'1 / 4 쨌 Plan',
+    'sheet-todo':'2 / 4 쨌 Todo',
+    'sheet-do':'3 / 4 쨌 Do',
+    'sheet-see':'4 / 4 쨌 See'
   };
   var currentSheetIndex = 0;
   var pageNumEl = document.getElementById('page-num');
@@ -687,7 +687,7 @@
 
   function getPriorityValue(){
     var checked = form.querySelector('input[name="priority"]:checked');
-    return checked ? checked.value : '중간';
+    return checked ? checked.value : '以묎컙';
   }
   function setPriorityValue(v){
     form.querySelectorAll('input[name="priority"]').forEach(function(r){ r.checked = (r.value === v); });
@@ -698,10 +698,10 @@
   }
   function resetFormToNew(){
     editingPlanId = null;
-    btnSave.textContent = '계획 ?�??;
+    btnSave.textContent = '怨꾪쉷 ???;
     btnCancel.classList.remove('show');
     form.reset();
-    setPriorityValue('중간');
+    setPriorityValue('以묎컙');
   }
   function loadPlanIntoForm(p){
     editingPlanId = p.id;
@@ -710,7 +710,7 @@
     setPriorityValue(p.priority);
     successCriteria.value = p.success_criteria;
     estimatedMinutes.value = p.estimated_minutes;
-    btnSave.textContent = '?�정 ?�용 ?�??;
+    btnSave.textContent = '?섏젙 ?댁슜 ???;
     btnCancel.classList.add('show');
   }
   btnCancel.addEventListener('click', resetFormToNew);
@@ -725,7 +725,7 @@
       estimated_minutes: Number(estimatedMinutes.value)
     };
     btnSave.disabled = true;
-    setStatus('?�?�하??�?..');
+    setStatus('??ν븯??以?..');
 
     var result = editingPlanId
       ? await sb.from('plans').update(payload).eq('id', editingPlanId)
@@ -733,10 +733,10 @@
 
     btnSave.disabled = false;
     if(result.error){
-      setStatus('???�???�패: ' + result.error.message, true);
+      setStatus('??????ㅽ뙣: ' + result.error.message, true);
       return;
     }
-    setStatus(editingPlanId ? '?�정 ?�용???�?�됐?�니??(?�전 ?�용?� ?�력???�았?�니??' : '??계획???�?�됐?�니??);
+    setStatus(editingPlanId ? '?섏젙 ?댁슜????λ릱?듬땲??(?댁쟾 ?댁슜? ?대젰???⑥븯?듬땲??' : '??怨꾪쉷????λ릱?듬땲??);
     resetFormToNew();
     await loadPlansAndRender();
   });
@@ -748,7 +748,7 @@
 
   function renderPlanList(plans){
     if(plans.length === 0){
-      planListEl.innerHTML = '<div class="empty-note">?�?�된 계획???�습?�다.</div>';
+      planListEl.innerHTML = '<div class="empty-note">??λ맂 怨꾪쉷???놁뒿?덈떎.</div>';
       return;
     }
     planListEl.innerHTML = '';
@@ -762,27 +762,27 @@
 
       var priorityLine = document.createElement('div');
       priorityLine.className = 'meta-line';
-      priorityLine.innerHTML = '?�선?�위: <b>' + p.priority + '</b>';
+      priorityLine.innerHTML = '?곗꽑?쒖쐞: <b>' + p.priority + '</b>';
 
       var criteriaLine = document.createElement('div');
       criteriaLine.className = 'meta-line';
-      criteriaLine.textContent = '?�공 기�?: ' + p.success_criteria;
+      criteriaLine.textContent = '?깃났 湲곗?: ' + p.success_criteria;
 
       var estLine = document.createElement('div');
       estLine.className = 'meta-line';
-      estLine.textContent = '?�상 ?�간: ' + p.estimated_minutes + '�?;
+      estLine.textContent = '?덉긽 ?쒓컙: ' + p.estimated_minutes + '遺?;
 
       var actions = document.createElement('div');
       actions.className = 'entry-actions';
 
       var editBtn = document.createElement('button');
       editBtn.type = 'button';
-      editBtn.textContent = '?�정';
+      editBtn.textContent = '?섏젙';
       editBtn.addEventListener('click', function(){ loadPlanIntoForm(p); });
 
       var revBtn = document.createElement('button');
       revBtn.type = 'button';
-      revBtn.textContent = '?�전 버전 보기';
+      revBtn.textContent = '?댁쟾 踰꾩쟾 蹂닿린';
 
       var revBox = document.createElement('div');
       revBox.className = 'revisions';
@@ -790,15 +790,15 @@
 
       revBtn.addEventListener('click', async function(){
         var isOpen = revBox.classList.contains('open');
-        if(isOpen){ revBox.classList.remove('open'); revBtn.textContent = '?�전 버전 보기'; return; }
-        revBtn.textContent = '?�전 버전 ?�기';
+        if(isOpen){ revBox.classList.remove('open'); revBtn.textContent = '?댁쟾 踰꾩쟾 蹂닿린'; return; }
+        revBtn.textContent = '?댁쟾 踰꾩쟾 ?リ린';
         revBox.classList.add('open');
         if(!loaded){
-          revBox.innerHTML = '<div class="rev-empty">불러?�는 �?..</div>';
+          revBox.innerHTML = '<div class="rev-empty">遺덈윭?ㅻ뒗 以?..</div>';
           var revisions = await fetchRevisions(p.id);
           loaded = true;
           if(revisions.length === 0){
-            revBox.innerHTML = '<div class="rev-empty">?�직 ?�정 ?�력???�습?�다</div>';
+            revBox.innerHTML = '<div class="rev-empty">?꾩쭅 ?섏젙 ?대젰???놁뒿?덈떎</div>';
             return;
           }
           revBox.innerHTML = '';
@@ -806,7 +806,7 @@
             var item = document.createElement('div');
             item.className = 'rev-item';
             var when = new Date(r.revised_at).toLocaleString('ko-KR');
-            item.textContent = when + ' ?�정 ????' + r.period_start + '~' + r.period_end + ' / ' + r.priority + ' / ' + r.success_criteria + ' / ' + r.estimated_minutes + '�?;
+            item.textContent = when + ' ?섏젙 ????' + r.period_start + '~' + r.period_end + ' / ' + r.priority + ' / ' + r.success_criteria + ' / ' + r.estimated_minutes + '遺?;
             revBox.appendChild(item);
           });
         }
@@ -871,10 +871,10 @@
   });
 
   async function loadPlansAndRender(){
-    planListEl.innerHTML = '<div class="empty-note">불러?�는 �?..</div>';
+    planListEl.innerHTML = '<div class="empty-note">遺덈윭?ㅻ뒗 以?..</div>';
     var res = await sb.from('plans').select('*').order('created_at', { ascending:false });
     if(res.error){
-      planListEl.innerHTML = '<div class="empty-note">??목록??불러?��? 못했?�니?? ' + res.error.message + '</div>';
+      planListEl.innerHTML = '<div class="empty-note">??紐⑸줉??遺덈윭?ㅼ? 紐삵뻽?듬땲?? ' + res.error.message + '</div>';
       currentPlans = [];
       renderCalendar();
       return;
@@ -893,13 +893,13 @@
     await sb.from('plans').insert({
       period_start: todayISO(0),
       period_end: todayISO(27),
-      priority: '?�음',
-      success_criteria: '�?3???�상, ?�이??40�?+ ?�산??20�?,
+      priority: '?믪쓬',
+      success_criteria: '二?3???댁긽, ?⑥씠??40遺?+ ?좎궛??20遺?,
       estimated_minutes: 720
     });
   }
 
-  /* ================= ????(카드2) ================= */
+  /* ================= ????(移대뱶2) ================= */
   var todoForm = document.getElementById('todo-form');
   var todoPlanSelect = document.getElementById('todo-plan-select');
   var todoTitle = document.getElementById('todo-title');
@@ -920,11 +920,11 @@
   var currentTodos = [];
 
   var SORT_LABELS = {
-    due_asc: '?�렬 기�?: 마감?�이 빠른 ??,
-    priority: '?�렬 기�?: ?�선?�위 (?�음 ????��)',
-    estimated_desc: '?�렬 기�?: ?�상 ?�간??많�? ??
+    due_asc: '?뺣젹 湲곗?: 留덇컧?쇱씠 鍮좊Ⅸ ??,
+    priority: '?뺣젹 湲곗?: ?곗꽑?쒖쐞 (?믪쓬 ????쓬)',
+    estimated_desc: '?뺣젹 湲곗?: ?덉긽 ?쒓컙??留롮? ??
   };
-  var PRIORITY_RANK = { '?�음':0, '중간':1, '??��':2 };
+  var PRIORITY_RANK = { '?믪쓬':0, '以묎컙':1, '??쓬':2 };
 
   function populatePlanSelect(){
     var prev = todoPlanSelect.value;
@@ -942,7 +942,7 @@
 
   function getTodoPriorityValue(){
     var c = todoForm.querySelector('input[name="todo-priority"]:checked');
-    return c ? c.value : '중간';
+    return c ? c.value : '以묎컙';
   }
   function setTodoPriorityValue(v){
     todoForm.querySelectorAll('input[name="todo-priority"]').forEach(function(r){ r.checked = (r.value === v); });
@@ -953,10 +953,10 @@
   }
   function resetTodoForm(){
     editingTodoId = null;
-    todoBtnSave.textContent = '?????�??;
+    todoBtnSave.textContent = '???????;
     todoBtnCancel.classList.remove('show');
     todoForm.reset();
-    setTodoPriorityValue('중간');
+    setTodoPriorityValue('以묎컙');
     populatePlanSelect();
   }
   function loadTodoIntoForm(t){
@@ -966,9 +966,9 @@
     todoContent.value = t.content || '';
     todoDue.value = t.due_date || '';
     todoEstimated.value = t.estimated_minutes;
-    setTodoPriorityValue(t.priority || '중간');
+    setTodoPriorityValue(t.priority || '以묎컙');
     todoTags.value = (t.tags || []).join(', ');
-    todoBtnSave.textContent = '?�정 ?�용 ?�??;
+    todoBtnSave.textContent = '?섏젙 ?댁슜 ???;
     todoBtnCancel.classList.add('show');
   }
   todoBtnCancel.addEventListener('click', resetTodoForm);
@@ -980,7 +980,7 @@
   todoForm.addEventListener('submit', async function(e){
     e.preventDefault();
     if(!todoPlanSelect.value){
-      setTodoStatus('??먼�? 계획???�나 ?�상 ?�?�해주세??, true);
+      setTodoStatus('??癒쇱? 怨꾪쉷???섎굹 ?댁긽 ??ν빐二쇱꽭??, true);
       return;
     }
     var payload = {
@@ -993,7 +993,7 @@
       estimated_minutes: Number(todoEstimated.value || 0)
     };
     todoBtnSave.disabled = true;
-    setTodoStatus('?�?�하??�?..');
+    setTodoStatus('??ν븯??以?..');
 
     var result = editingTodoId
       ? await sb.from('todos').update(payload).eq('id', editingTodoId)
@@ -1001,20 +1001,20 @@
 
     todoBtnSave.disabled = false;
     if(result.error){
-      setTodoStatus('???�???�패: ' + result.error.message, true);
+      setTodoStatus('??????ㅽ뙣: ' + result.error.message, true);
       return;
     }
-    setTodoStatus(editingTodoId ? '?�정?�습?�다' : '?????�이 ?�?�됐?�니??);
+    setTodoStatus(editingTodoId ? '?섏젙?먯뒿?덈떎' : '?????쇱씠 ??λ릱?듬땲??);
     resetTodoForm();
     await loadTodosAndRender();
   });
 
   async function toggleTodoComplete(t){
     if(t.status === 'done'){
-      // ?�돌리기: ?�료 ?�벤????�� ???�태 ?�돌�?      await sb.from('completion_events').delete().eq('todo_id', t.id);
+      // ?섎룎由ш린: ?꾨즺 ?대깽????젣 ???곹깭 ?섎룎由?      await sb.from('completion_events').delete().eq('todo_id', t.id);
       await sb.from('todos').update({ status:'in_progress' }).eq('id', t.id);
     } else {
-      // ?�료: ?�벤?��? ?��? ?�으�??��?) unique ?�약??막아주�?�??�러??무시
+      // ?꾨즺: ?대깽?멸? ?대? ?덉쑝硫??고?) unique ?쒖빟??留됱븘二쇰?濡??먮윭??臾댁떆
       await sb.from('completion_events').insert({ todo_id: t.id });
       await sb.from('todos').update({ status:'done' }).eq('id', t.id);
     }
@@ -1075,8 +1075,8 @@
     var drillBannerEl = document.getElementById('drill-banner');
     var drillBannerTextEl = document.getElementById('drill-banner-text');
     if(drillFilter){
-      var modeText = { all:'?�체', done:'?�료', overdue:'지??, blocked:'막힘' }[drillFilter.mode] || drillFilter.mode;
-      drillBannerTextEl.textContent = '?�아보기?�서 ?�동??· "' + modeText + '" 조건?????�만 ?�시 �?;
+      var modeText = { all:'?꾩껜', done:'?꾨즺', overdue:'吏??, blocked:'留됲옒' }[drillFilter.mode] || drillFilter.mode;
+      drillBannerTextEl.textContent = '?뚯븘蹂닿린?먯꽌 ?대룞??쨌 "' + modeText + '" 議곌굔?????쇰쭔 ?쒖떆 以?;
       drillBannerEl.style.display = 'flex';
     } else {
       drillBannerEl.style.display = 'none';
@@ -1084,11 +1084,11 @@
     todoSortLabelEl.textContent = SORT_LABELS[todoSortEl.value] || '';
     var list = getFilteredSortedTodos();
     if(currentTodos.length === 0){
-      todoListEl.innerHTML = '<div class="empty-note">???�이 ?�습?�다.</div>';
+      todoListEl.innerHTML = '<div class="empty-note">???쇱씠 ?놁뒿?덈떎.</div>';
       return;
     }
     if(list.length === 0){
-      todoListEl.innerHTML = '<div class="empty-note">조건??맞는 ???�이 ?�습?�다.</div>';
+      todoListEl.innerHTML = '<div class="empty-note">議곌굔??留욌뒗 ???쇱씠 ?놁뒿?덈떎.</div>';
       return;
     }
     todoListEl.innerHTML = '';
@@ -1112,10 +1112,10 @@
       var meta = document.createElement('div');
       meta.className = 'todo-meta';
       var metaBits = [];
-      if(t.due_date) metaBits.push('마감 ' + t.due_date);
-      metaBits.push('?�선?�위 ' + t.priority);
-      metaBits.push(t.estimated_minutes + '�?);
-      meta.textContent = metaBits.join(' · ');
+      if(t.due_date) metaBits.push('留덇컧 ' + t.due_date);
+      metaBits.push('?곗꽑?쒖쐞 ' + t.priority);
+      metaBits.push(t.estimated_minutes + '遺?);
+      meta.textContent = metaBits.join(' 쨌 ');
 
       var tagsEl = document.createElement('div');
       tagsEl.className = 'todo-tags';
@@ -1128,12 +1128,12 @@
       var actions = document.createElement('div');
       actions.className = 'todo-actions';
       var editBtn = document.createElement('button');
-      editBtn.type = 'button'; editBtn.textContent = '?�정';
+      editBtn.type = 'button'; editBtn.textContent = '?섏젙';
       editBtn.addEventListener('click', function(){ loadTodoIntoForm(t); });
       var delBtn = document.createElement('button');
-      delBtn.type = 'button'; delBtn.textContent = '??��';
+      delBtn.type = 'button'; delBtn.textContent = '??젣';
       delBtn.addEventListener('click', function(){
-        if(confirm('?????�을 지?�까??')) deleteTodo(t);
+        if(confirm('?????쇱쓣 吏?멸퉴??')) deleteTodo(t);
       });
       actions.appendChild(editBtn);
       actions.appendChild(delBtn);
@@ -1154,10 +1154,10 @@
   todoSortEl.addEventListener('change', renderTodoList);
 
   async function loadTodosAndRender(){
-    todoListEl.innerHTML = '<div class="empty-note">불러?�는 �?..</div>';
+    todoListEl.innerHTML = '<div class="empty-note">遺덈윭?ㅻ뒗 以?..</div>';
     var res = await sb.from('todos').select('*').eq('is_deleted', false).order('created_at', { ascending:false });
     if(res.error){
-      todoListEl.innerHTML = '<div class="empty-note">??목록??불러?��? 못했?�니?? ' + res.error.message + '</div>';
+      todoListEl.innerHTML = '<div class="empty-note">??紐⑸줉??遺덈윭?ㅼ? 紐삵뻽?듬땲?? ' + res.error.message + '</div>';
       currentTodos = [];
       return;
     }
@@ -1174,11 +1174,11 @@
     var planId = planRes.data[0].id;
 
     var seeds = [
-      { title:'?�이??- ?�체', content:'벤치?�레?? ?��??�운, ?�더?�레??, due_date: todayISO(2), priority:'?�음', tags:['근력'], estimated_minutes:60 },
-      { title:'?�이??- ?�체', content:'?�쿼?? ?�그?�레?? ?��?', due_date: todayISO(4), priority:'?�음', tags:['근력'], estimated_minutes:60 },
-      { title:'?�산??- ?�닝 5km', content:'?�이??6�?km 목표', due_date: todayISO(1), priority:'중간', tags:['?�산??], estimated_minutes:30 },
-      { title:'?�산??- ?�이??, content:'?�내 ?�전�?30�?, due_date: todayISO(3), priority:'중간', tags:['?�산??], estimated_minutes:30 },
-      { title:'?�트?�칭 - ?�신', content:'?�동 ?�후 ?�트?�칭', due_date: todayISO(5), priority:'??��', tags:['?�복'], estimated_minutes:20 }
+      { title:'?⑥씠??- ?곸껜', content:'踰ㅼ튂?꾨젅?? ?ロ??ㅼ슫, ?꾨뜑?꾨젅??, due_date: todayISO(2), priority:'?믪쓬', tags:['洹쇰젰'], estimated_minutes:60 },
+      { title:'?⑥씠??- ?섏껜', content:'?ㅼ옘?? ?덇렇?꾨젅?? ?곗?', due_date: todayISO(4), priority:'?믪쓬', tags:['洹쇰젰'], estimated_minutes:60 },
+      { title:'?좎궛??- ?щ떇 5km', content:'?섏씠??6遺?km 紐⑺몴', due_date: todayISO(1), priority:'以묎컙', tags:['?좎궛??], estimated_minutes:30 },
+      { title:'?좎궛??- ?ъ씠??, content:'?ㅻ궡 ?먯쟾嫄?30遺?, due_date: todayISO(3), priority:'以묎컙', tags:['?좎궛??], estimated_minutes:30 },
+      { title:'?ㅽ듃?덉묶 - ?꾩떊', content:'?대룞 ?꾪썑 ?ㅽ듃?덉묶', due_date: todayISO(5), priority:'??쓬', tags:['?뚮났'], estimated_minutes:20 }
     ];
     for(var i=0;i<seeds.length;i++){
       var s = seeds[i];
@@ -1187,7 +1187,7 @@
     }
   }
 
-  /* ================= ?�행 기록 (카드3, Do) ================= */
+  /* ================= ?ㅽ뻾 湲곕줉 (移대뱶3, Do) ================= */
   var runForm = document.getElementById('run-form');
   var runTodoSelect = document.getElementById('run-todo-select');
   var runStart = document.getElementById('run-start');
@@ -1199,7 +1199,7 @@
 
   function todoTitleById(id){
     var t = currentTodos.find(function(x){ return x.id === id; });
-    return t ? t.title : '(??��??????';
+    return t ? t.title : '(??젣??????';
   }
 
   function populateRunTodoSelect(){
@@ -1208,7 +1208,7 @@
     currentTodos.forEach(function(t){
       var opt = document.createElement('option');
       opt.value = t.id;
-      opt.textContent = t.title + (t.status==='done' ? ' (?�료)' : '');
+      opt.textContent = t.title + (t.status==='done' ? ' (?꾨즺)' : '');
       runTodoSelect.appendChild(opt);
     });
     if(prev && currentTodos.some(function(t){ return t.id === prev; })){
@@ -1224,13 +1224,13 @@
   runForm.addEventListener('submit', async function(e){
     e.preventDefault();
     if(!runTodoSelect.value){
-      setRunStatus('??먼�? ???�을 ?�나 ?�상 만들?�주?�요', true);
+      setRunStatus('??癒쇱? ???쇱쓣 ?섎굹 ?댁긽 留뚮뱾?댁＜?몄슂', true);
       return;
     }
     var start = new Date(runStart.value);
     var end = new Date(runEnd.value);
     if(!(end > start)){
-      setRunStatus('???�난 ?�각???�작 ?�각보다 ??��???�니??, true);
+      setRunStatus('???앸궃 ?쒓컖???쒖옉 ?쒓컖蹂대떎 ??뼱???⑸땲??, true);
       return;
     }
     var actualMinutes = Math.round((end - start) / 60000);
@@ -1242,14 +1242,14 @@
       blocked_reason: runBlocked.value.trim() || null
     };
     document.getElementById('run-btn-save').disabled = true;
-    setRunStatus('?�?�하??�?..');
+    setRunStatus('??ν븯??以?..');
     var result = await sb.from('run_logs').insert(payload);
     document.getElementById('run-btn-save').disabled = false;
     if(result.error){
-      setRunStatus('???�???�패: ' + result.error.message, true);
+      setRunStatus('??????ㅽ뙣: ' + result.error.message, true);
       return;
     }
-    setRunStatus('?�행 기록???�?�됐?�니??(' + actualMinutes + '�?');
+    setRunStatus('?ㅽ뻾 湲곕줉????λ릱?듬땲??(' + actualMinutes + '遺?');
     runForm.reset();
     await loadRunLogsAndRender();
     renderSeeStats();
@@ -1257,7 +1257,7 @@
 
   function renderRunList(){
     if(currentRunLogs.length === 0){
-      runListEl.innerHTML = '<div class="empty-note">?�행 기록???�습?�다.</div>';
+      runListEl.innerHTML = '<div class="empty-note">?ㅽ뻾 湲곕줉???놁뒿?덈떎.</div>';
       return;
     }
     runListEl.innerHTML = '';
@@ -1271,13 +1271,13 @@
       meta.className = 'run-meta';
       var s = new Date(r.started_at).toLocaleString('ko-KR');
       var e = new Date(r.ended_at).toLocaleString('ko-KR');
-      meta.textContent = s + ' ~ ' + e + ' · ?�제 ' + r.actual_minutes + '�?;
+      meta.textContent = s + ' ~ ' + e + ' 쨌 ?ㅼ젣 ' + r.actual_minutes + '遺?;
       entry.appendChild(title);
       entry.appendChild(meta);
       if(r.blocked_reason){
         var blocked = document.createElement('div');
         blocked.className = 'run-blocked';
-        blocked.textContent = '막힘: ' + r.blocked_reason;
+        blocked.textContent = '留됲옒: ' + r.blocked_reason;
         entry.appendChild(blocked);
       }
       runListEl.appendChild(entry);
@@ -1285,10 +1285,10 @@
   }
 
   async function loadRunLogsAndRender(){
-    runListEl.innerHTML = '<div class="empty-note">불러?�는 �?..</div>';
+    runListEl.innerHTML = '<div class="empty-note">遺덈윭?ㅻ뒗 以?..</div>';
     var res = await sb.from('run_logs').select('*').order('started_at', { ascending:false });
     if(res.error){
-      runListEl.innerHTML = '<div class="empty-note">??목록??불러?��? 못했?�니?? ' + res.error.message + '</div>';
+      runListEl.innerHTML = '<div class="empty-note">??紐⑸줉??遺덈윭?ㅼ? 紐삵뻽?듬땲?? ' + res.error.message + '</div>';
       currentRunLogs = [];
       return;
     }
@@ -1312,7 +1312,7 @@
     return seoul.getFullYear() + '-' + pad2(seoul.getMonth()+1) + '-' + pad2(seoul.getDate());
   }
 
-  /* ================= ?�아보기 (카드4, See) ================= */
+  /* ================= ?뚯븘蹂닿린 (移대뱶4, See) ================= */
   var seePlanSelect = document.getElementById('see-plan-select');
   var seeStatsEl = document.getElementById('see-stats');
   var seeNote = document.getElementById('see-note');
@@ -1349,7 +1349,7 @@
 
   function renderSeeStats(){
     if(!seePlanSelect.value){
-      seeStatsEl.innerHTML = '<div class="empty-note">먼�? 계획???�나 ?�?�해주세??</div>';
+      seeStatsEl.innerHTML = '<div class="empty-note">癒쇱? 怨꾪쉷???섎굹 ??ν빐二쇱꽭??</div>';
       return;
     }
     var planId = seePlanSelect.value;
@@ -1373,15 +1373,15 @@
 
     seeStatsEl.innerHTML =
       '<div class="stat-grid">' +
-        '<div class="stat-box"><div class="stat-label">계획 ??(지?��? ?��? ????</div><div class="stat-num" id="stat-plan">'+planCount+'</div></div>' +
-        '<div class="stat-box"><div class="stat-label">?�료 ??/div><div class="stat-num" id="stat-done">'+doneCount+'</div></div>' +
-        '<div class="stat-box"><div class="stat-label">지????/div><div class="stat-num" id="stat-overdue">'+overdueCount+'</div></div>' +
-        '<div class="stat-box"><div class="stat-label">막힘 ??/div><div class="stat-num" id="stat-blocked">'+blockedCount+'</div></div>' +
+        '<div class="stat-box"><div class="stat-label">怨꾪쉷 ??(吏?곗? ?딆? ????</div><div class="stat-num" id="stat-plan">'+planCount+'</div></div>' +
+        '<div class="stat-box"><div class="stat-label">?꾨즺 ??/div><div class="stat-num" id="stat-done">'+doneCount+'</div></div>' +
+        '<div class="stat-box"><div class="stat-label">吏????/div><div class="stat-num" id="stat-overdue">'+overdueCount+'</div></div>' +
+        '<div class="stat-box"><div class="stat-label">留됲옒 ??/div><div class="stat-num" id="stat-blocked">'+blockedCount+'</div></div>' +
       '</div>' +
       '<div class="time-compare">' +
-        '?�상 ?�간 ?�계: <b>'+estSum+'�?/b><br>' +
-        '?�제 ?�간 ?�계: <b>'+actualSum+'�?/b><br>' +
-        '차이(?�제-?�상): <b>'+(diff>=0?'+':'')+diff+'�?/b>' +
+        '?덉긽 ?쒓컙 ?⑷퀎: <b>'+estSum+'遺?/b><br>' +
+        '?ㅼ젣 ?쒓컙 ?⑷퀎: <b>'+actualSum+'遺?/b><br>' +
+        '李⑥씠(?ㅼ젣-?덉긽): <b>'+(diff>=0?'+':'')+diff+'遺?/b>' +
       '</div>';
 
     document.getElementById('stat-plan').addEventListener('click', function(){ jumpToTodos(planId, 'all'); });
@@ -1393,23 +1393,23 @@
   seeCarryBtn.addEventListener('click', function(){
     var note = seeNote.value.trim();
     if(!note){
-      seeCarryStatus.textContent = '??먼�? 고칠 ?�을 ??�??�어주세??;
+      seeCarryStatus.textContent = '??癒쇱? 怨좎튌 ?먯쓣 ??以??곸뼱二쇱꽭??;
       seeCarryStatus.className = 'err';
       return;
     }
     resetFormToNew();
-    successCriteria.value = '[?�아보기 반영] ' + note;
+    successCriteria.value = '[?뚯븘蹂닿린 諛섏쁺] ' + note;
     seeCarryStatus.textContent = '';
     showSheet(SHEETS.indexOf('sheet-plan'));
   });
 
-  /* ================= ?�체 ?�료 ?�보?�기 (카드5) ================= */
+  /* ================= ?꾩껜 ?먮즺 ?대낫?닿린 (移대뱶5) ================= */
   var exportBtn = document.getElementById('export-btn');
   var exportStatus = document.getElementById('export-status');
 
   exportBtn.addEventListener('click', async function(){
     exportBtn.disabled = true;
-    exportStatus.textContent = '?�료�?모으??�?..';
+    exportStatus.textContent = '?먮즺瑜?紐⑥쑝??以?..';
     try{
       var revRes = await sb.from('plan_revisions').select('*').order('revised_at', { ascending:false });
       var payload = {
@@ -1429,9 +1429,9 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      exportStatus.textContent = '?�보?�기 ?�료';
+      exportStatus.textContent = '?대낫?닿린 ?꾨즺';
     } catch(err){
-      exportStatus.textContent = '???�보?�기 ?�패: ' + err.message;
+      exportStatus.textContent = '???대낫?닿린 ?ㅽ뙣: ' + err.message;
     }
     exportBtn.disabled = false;
   });
@@ -1488,28 +1488,28 @@
     window.handleLogin = async function() {
       var email = document.getElementById('login-email').value.trim();
       var password = document.getElementById('login-password').value;
-      if (!email || !password) { showError('�̸��ϰ� ��й�ȣ�� �Է����ּ���.'); return; }
+      if (!email || !password) { showError('이메일과 비밀번호를 입력해주세요.'); return; }
       var result = await sb2.auth.signInWithPassword({ email: email, password: password });
-      if (result.error) { showError('�̸��� �Ǵ� ��й�ȣ�� Ȯ�����ּ���.'); return; }
+      if (result.error) { showError('이메일 또는 비밀번호를 확인해주세요.'); return; }
     };
 
     window.handleSignup = async function() {
       var email = document.getElementById('signup-email').value.trim();
       var password = document.getElementById('signup-password').value;
       var password2 = document.getElementById('signup-password2').value;
-      if (!email || !password) { showError('�̸��ϰ� ��й�ȣ�� �Է����ּ���.'); return; }
-      if (password !== password2) { showError('��й�ȣ�� ��ġ���� �ʽ��ϴ�.'); return; }
-      if (password.length < 6) { showError('��й�ȣ�� 6�� �̻��̾�� �մϴ�.'); return; }
+      if (!email || !password) { showError('이메일과 비밀번호를 입력해주세요.'); return; }
+      if (password !== password2) { showError('비밀번호가 일치하지 않습니다.'); return; }
+      if (password.length < 6) { showError('비밀번호는 6자 이상이어야 합니다.'); return; }
       var result = await sb2.auth.signUp({ email: email, password: password });
       if (result.error) {
         if (result.error.message.includes('already registered')) {
-          showError('�̹� ���Ե� �̸����Դϴ�.');
+          showError('이미 가입된 이메일입니다.');
         } else {
-          showError('���� �� ������ �߻��߽��ϴ�: ' + result.error.message);
+          showError('가입 중 오류가 발생했습니다: ' + result.error.message);
         }
         return;
       }
-      alert('���� �Ϸ�! �α������ּ���.');
+      alert('가입 완료! 로그인해주세요.');
       switchTab('login');
     };
 
