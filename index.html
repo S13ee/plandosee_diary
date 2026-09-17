@@ -1,1440 +1,202 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>플랜두씨 다이어리</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Alex+Brush&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg-green: #8C9C85;
-    --cover-brown: #4A3728;
-    --cover-brown-light: #5C4735;
-    --paper: #FDFBF5;
-    --paper-shade: #EFE9DA;
-    --rule-line: rgba(50,46,41,0.06);
-    --title-red: #C6382A;
-    --ink: #322E29;
-    --ink-soft: #837D72;
-    --accent-green: #5E7856;
-    --page-w: clamp(300px, 46vw, 460px);
-    --book-h: clamp(600px, 86vh, 720px);
-  }
-  *{ box-sizing:border-box; }
-  html,body{ margin:0; padding:0; }
-  body{
-    background: var(--bg-green);
-    font-family: 'Noto Sans KR', sans-serif;
-    color: var(--ink);
-    min-height: 100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    padding: 40px 16px;
-  }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>플랜두씨 다이어리</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; color: #333; }
+    .hidden { display: none !important; }
 
-  .title-font{ font-family: 'Alex Brush', cursive; }
+    #auth-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .auth-box {
+      background: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.1);
+      width: 360px;
+    }
+    .auth-box h1 { font-size: 22px; margin-bottom: 8px; }
+    .auth-box p { color: #888; font-size: 14px; margin-bottom: 24px; }
+    .auth-tabs { display: flex; margin-bottom: 24px; border-bottom: 2px solid #eee; }
+    .auth-tab {
+      flex: 1; padding: 10px; text-align: center;
+      cursor: pointer; font-size: 14px; color: #888;
+      border-bottom: 2px solid transparent; margin-bottom: -2px;
+    }
+    .auth-tab.active { color: #4f46e5; border-bottom-color: #4f46e5; font-weight: 600; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 13px; margin-bottom: 6px; color: #555; }
+    .form-group input {
+      width: 100%; padding: 10px 12px;
+      border: 1px solid #ddd; border-radius: 8px;
+      font-size: 14px; outline: none;
+    }
+    .form-group input:focus { border-color: #4f46e5; }
+    .btn-primary {
+      width: 100%; padding: 12px;
+      background: #4f46e5; color: white;
+      border: none; border-radius: 8px;
+      font-size: 15px; cursor: pointer; font-weight: 600;
+    }
+    .btn-primary:hover { background: #4338ca; }
+    .auth-error {
+      background: #fef2f2; color: #dc2626;
+      padding: 10px 12px; border-radius: 8px;
+      font-size: 13px; margin-bottom: 16px;
+    }
 
-  /* ---------- 닫힌 표지 ---------- */
-  #cover-screen{
-    width: var(--page-w);
-    height: var(--book-h);
-    background: linear-gradient(155deg, var(--cover-brown-light), var(--cover-brown) 60%);
-    border-radius: 4px;
-    box-shadow: 0 18px 44px rgba(0,0,0,0.35), inset -6px 0 0 rgba(0,0,0,0.15);
-    position: relative;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    padding: 30px;
-    overflow:hidden;
-  }
-  #cover-screen .brand-caps{
-    font-family: 'Anton', sans-serif;
-    font-size: 17px;
-    letter-spacing: 3px;
-    color: #fff;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.35);
-  }
-  #cover-screen .brand-script{
-    font-family: 'Alex Brush', cursive;
-    font-size: 64px;
-    line-height: 1;
-    color: #fff;
-    margin-top: 2px;
-    text-shadow: 0 3px 6px rgba(0,0,0,0.35);
-  }
-
-  .page-fold{
-    position:absolute;
-    right:0; bottom:0;
-    width: 56px; height:56px;
-    cursor:pointer;
-    z-index:3;
-  }
-  .page-fold::before{
-    content:"";
-    position:absolute;
-    inset:0;
-    background: linear-gradient(135deg, transparent 50%, var(--paper) 50.5%);
-    box-shadow: -4px -4px 10px rgba(0,0,0,0.28);
-    transition: width 0.18s ease, height 0.18s ease;
-  }
-  .page-fold:hover::before{ width:66px; height:66px; }
-
-  #app-root{ display:none; width:100%; }
-  #app-root.open{ display:flex; justify-content:center; }
-
-  .close-tab{
-    position:absolute;
-    top: -14px; left: 50%;
-    transform: translateX(-50%);
-    background: var(--cover-brown);
-    color: var(--paper);
-    font-size: 11px;
-    padding: 5px 14px;
-    border-radius: 0 0 6px 6px;
-    cursor:pointer;
-    z-index: 4;
-  }
-
-  .diary-spread{
-    width: calc(var(--page-w) * 2);
-    max-width: 100%;
-    display:flex;
-    position:relative;
-    box-shadow: 0 14px 40px rgba(0,0,0,0.3);
-    border-radius: 4px;
-  }
-
-  /* 중앙 제본선 - 은은한 명암만, 스프링 그래픽 없음 */
-  .spine{
-    position:absolute;
-    left:50%; top:0; bottom:0;
-    width: 2px;
-    transform: translateX(-50%);
-    z-index: 2;
-    pointer-events:none;
-  }
-  .spine::before, .spine::after{
-    content:"";
-    position:absolute; top:0; bottom:0;
-    width: 34px;
-  }
-  .spine::before{ left:-34px; background: linear-gradient(to right, transparent, rgba(0,0,0,0.07)); }
-  .spine::after{ right:-34px; background: linear-gradient(to left, transparent, rgba(0,0,0,0.07)); }
-
-  .page{
-    flex: none;
-    width: var(--page-w);
-    height: var(--book-h);
-    overflow-y: auto;
-    overflow-x: hidden;
-    background: var(--paper);
-    padding: 26px 34px 46px;
-    position: relative;
-    background-image: repeating-linear-gradient(
-      to bottom, transparent 0, transparent 30px, var(--rule-line) 31px
-    );
-    background-position: 0 108px;
-  }
-  .page:first-child{ border-radius: 4px 0 0 4px; padding-right: 30px; }
-  .page:last-child{ border-radius: 0 4px 4px 0; padding-left: 30px; }
-
-  /* ---------- 시트(페이지 넘김) ---------- */
-  .sheet{ min-height: 0; }
-  .page-num{
-    position:absolute; top: 14px; right: 20px;
-    font-size: 10.5px; color: var(--ink-soft);
-  }
-  .page-turn{
-    position:absolute;
-    bottom:0; width: 44px; height:44px;
-    cursor:pointer; z-index: 4;
-    overflow: visible;
-  }
-  .page-turn::before{
-    content:"";
-    position:absolute; inset:0;
-    transition: transform .18s ease;
-  }
-  .page-turn.next{ right:0; }
-  .page-turn.next::before{
-    background: linear-gradient(135deg, transparent 50%, rgba(74,55,40,0.16) 50.5%);
-    box-shadow: -3px -3px 8px rgba(0,0,0,0.16);
-    transform-origin: bottom right;
-  }
-  .page-turn.next:hover::before{ transform: scale(1.18); }
-  .page-turn.prev{ left:0; }
-  .page-turn.prev::before{
-    background: linear-gradient(225deg, transparent 50%, rgba(74,55,40,0.16) 50.5%);
-    box-shadow: 3px -3px 8px rgba(0,0,0,0.16);
-    transform-origin: bottom left;
-  }
-  .page-turn.prev:hover::before{ transform: scale(1.18); }
-  .page-turn-label{
-    position:absolute; bottom: 16px;
-    font-size: 10px; color: var(--ink-soft); opacity: 0.75;
-    pointer-events:none; z-index:4;
-  }
-  .page-turn-label.next{ right: 52px; }
-  .page-turn-label.prev{ left: 52px; }
-  .page-turn.hidden, .page-turn-label.hidden{ visibility:hidden; }
-
-  h1.brand-mark{ margin: 0 0 4px; }
-  h1.brand-mark .brand-caps{
-    display:block;
-    font-family:'Anton', sans-serif;
-    font-size: 13px;
-    letter-spacing: 2.5px;
-    color: var(--title-red);
-  }
-  h1.brand-mark .brand-script{
-    display:block;
-    font-family:'Alex Brush', cursive;
-    font-size: 34px;
-    line-height: 1;
-    color: var(--title-red);
-  }
-  .subhead{ font-size: 12.5px; color: var(--ink-soft); margin: 6px 0 0; font-weight: 500; }
-  .tagline{ font-size: 13.5px; color: var(--accent-green); margin: 10px 0 0; font-weight: 700; line-height: 1.5; }
-  .notice{ margin-top: 10px; font-size: 10.5px; color: var(--ink-soft); line-height: 1.6; opacity: 0.85; }
-
-  h2.section-title{
-    font-family:'Alex Brush', cursive;
-    font-size: 24px;
-    font-weight: 400;
-    margin: 16px 0 8px;
-    color: var(--title-red);
-  }
-
-  .cal-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom: 8px; }
-  .cal-head .cal-title{ font-size: 14px; font-weight: 700; color: var(--ink); }
-  .cal-head button{ background:none; border:none; color: var(--accent-green); font-size: 15px; cursor:pointer; padding: 2px 8px; font-weight:700; }
-  .cal-head button:hover{ color: var(--cover-brown); }
-
-  table.cal-grid{ width:100%; border-collapse: collapse; font-size: 12px; }
-  table.cal-grid th{ font-weight: 500; color: var(--ink-soft); padding: 4px 0; font-size: 11px; }
-  table.cal-grid td{ text-align:center; padding: 6px 0; color: var(--ink); position:relative; }
-  table.cal-grid td.blank{ color: transparent; }
-  table.cal-grid td.in-plan{ background: rgba(94,120,86,0.16); }
-  table.cal-grid td.today span{
-    display:inline-block; width: 20px; height:20px; line-height:20px;
-    border-radius:50%; border: 1.4px solid var(--title-red); color: var(--title-red); font-weight:700;
-  }
-  .cal-legend{ margin-top: 10px; font-size: 11px; color: var(--ink-soft); display:flex; align-items:center; gap: 6px; }
-  .cal-legend .swatch{ width: 10px; height:10px; background: rgba(94,120,86,0.32); display:inline-block; }
-
-  form#plan-form{ margin-top: 4px; }
-  .field-row{ margin-bottom: 10px; }
-  .field-row label{ display:block; font-size: 11.5px; font-weight: 700; color: var(--ink-soft); margin-bottom: 4px; }
-  .field-row input[type="date"],
-  .field-row input[type="number"],
-  .field-row input[type="text"],
-  .field-row textarea,
-  #todo-form select{
-    -webkit-appearance: none; appearance: none;
-    width:100%; font-family:'Noto Sans KR', sans-serif; font-size: 14px;
-    padding: 4px 2px 6px; border: none; border-bottom: 1px solid rgba(50,46,41,0.18);
-    border-radius: 0;
-    background: transparent; color: var(--ink);
-  }
-  .field-row input:focus, .field-row textarea:focus, #todo-form select:focus{ outline:none; border-bottom-color: var(--accent-green); }
-  .field-row textarea{ resize: vertical; min-height: 32px; }
-  .period-row{ display:flex; gap:10px; align-items:center; }
-  .period-row input{ flex:1; }
-  .period-row span{ color: var(--ink-soft); font-size:13px; }
-
-  .priority-options{ display:flex; gap: 18px; }
-  .priority-options label{ display:flex; align-items:center; gap:6px; font-size: 13px; color: var(--ink-soft); cursor:pointer; }
-  .priority-options input:checked + span{ color: var(--accent-green); font-weight:700; }
-
-  .est-row{ display:flex; align-items:baseline; gap:8px; }
-  .est-row input{ width: 80px; flex: none; }
-  .est-row span{ font-size:13px; color:var(--ink-soft); }
-
-  .form-actions{ display:flex; justify-content:flex-end; gap:8px; margin-top: 8px; }
-  button{ font-family:'Noto Sans KR', sans-serif; cursor:pointer; }
-  .btn-save{ background: var(--accent-green); color:#fff; border:none; padding: 9px 18px; border-radius: 3px; font-size: 13px; font-weight: 700; }
-  .btn-save:hover{ opacity:0.88; }
-  .btn-cancel{ background:none; border:none; color: var(--ink-soft); font-size: 12.5px; text-decoration: underline; display:none; }
-  .btn-cancel.show{ display:inline-block; }
-
-  #plan-list{ margin-top: 10px; }
-  .plan-entry{ padding: 10px 0; border-bottom: 1px dashed rgba(50,46,41,0.14); font-size: 13px; }
-  .plan-entry .period{ font-weight:700; margin-bottom:3px; color: var(--cover-brown); }
-  .plan-entry .meta-line{ color: var(--ink); margin-bottom:2px; line-height:1.5; }
-  .plan-entry .meta-line b{ font-weight:700; color: var(--accent-green); }
-  .plan-entry .entry-actions{ margin-top:6px; display:flex; gap:12px; }
-  .plan-entry .entry-actions button{ background:none; border:none; padding:0; font-size: 11.5px; color: var(--ink-soft); text-decoration: underline; }
-  .plan-entry .entry-actions button:hover{ color: var(--accent-green); }
-
-  .revisions{ margin-top: 8px; display:none; }
-  .revisions.open{ display:block; }
-  .revisions .rev-item{ font-size: 11px; color: var(--ink-soft); padding: 4px 0; }
-  .revisions .rev-empty{ font-size:11px; color:var(--ink-soft); font-style:italic; }
-
-  /* ---------- 할 일 ---------- */
-  .todo-controls{
-    display:flex; gap:8px; margin-top: 6px; flex-wrap: wrap;
-  }
-  .todo-controls input, .todo-controls select{
-    font-family:'Noto Sans KR', sans-serif; font-size: 12.5px;
-    padding: 6px 8px; border: 1px solid rgba(50,46,41,0.15);
-    border-radius: 3px; background: #fff; color: var(--ink);
-  }
-  .todo-controls input{ flex: 1 1 120px; }
-  .sort-label{ font-size: 10.5px; color: var(--ink-soft); margin-top: 5px; }
-
-  #todo-list{ margin-top: 10px; }
-  .todo-entry{
-    padding: 9px 0; border-bottom: 1px dashed rgba(50,46,41,0.14); font-size: 13px;
-    display:flex; gap: 10px; align-items:flex-start;
-  }
-  .todo-entry.done{ opacity: 0.55; }
-  .todo-entry .todo-check{
-    width: 18px; height:18px; margin-top:2px; flex:none; cursor:pointer;
-    accent-color: var(--accent-green);
-  }
-  .todo-entry .todo-body{ flex:1; min-width:0; }
-  .todo-entry .todo-title{ font-weight:700; margin-bottom:2px; }
-  .todo-entry.done .todo-title{ text-decoration: line-through; }
-  .todo-entry .todo-meta{ font-size: 11.5px; color: var(--ink-soft); line-height:1.6; }
-  .todo-entry .todo-tags span{
-    display:inline-block; background: rgba(94,120,86,0.14); color: var(--accent-green);
-    font-size: 10.5px; padding: 1px 6px; border-radius: 8px; margin-right:4px;
-  }
-  .todo-entry .todo-actions{ margin-top:5px; display:flex; gap:10px; }
-  .todo-entry .todo-actions button{
-    background:none; border:none; padding:0; font-size: 11px; color: var(--ink-soft); text-decoration: underline;
-  }
-  .todo-entry .todo-actions button:hover{ color: var(--accent-green); }
-
-  /* ---------- 실행 기록 (Do) ---------- */
-  .run-entry{ padding: 9px 0; border-bottom: 1px dashed rgba(50,46,41,0.14); font-size: 12.5px; }
-  .run-entry .run-todo{ font-weight:700; margin-bottom:2px; }
-  .run-entry .run-meta{ color: var(--ink-soft); line-height:1.6; }
-  .run-entry .run-blocked{ color: var(--title-red); margin-top:2px; }
-
-  /* ---------- 돌아보기 (See) ---------- */
-  .stat-grid{
-    display:grid; grid-template-columns: 1fr 1fr; gap: 10px;
-    margin: 10px 0 16px;
-  }
-  .stat-box{
-    border-bottom: 1px solid rgba(50,46,41,0.12);
-    padding-bottom: 8px;
-  }
-  .stat-box .stat-label{ font-size: 10.5px; color: var(--ink-soft); }
-  .stat-box .stat-num{
-    font-size: 22px; font-weight:700; color: var(--accent-green);
-    cursor:pointer; text-decoration: underline dotted;
-  }
-  .stat-box .stat-num:hover{ color: var(--title-red); }
-  .time-compare{ font-size: 12.5px; color: var(--ink); line-height:1.7; margin-bottom: 8px; }
-  .time-compare b{ color: var(--cover-brown); }
-  .drill-banner{
-    background: rgba(94,120,86,0.12); border-radius:3px;
-    padding: 6px 10px; font-size: 11.5px; color: var(--accent-green);
-    display:flex; justify-content:space-between; align-items:center;
-    margin-bottom: 8px;
-  }
-  .drill-banner button{
-    background:none; border:none; color: var(--title-red);
-    font-size: 11px; text-decoration: underline;
-  }
-
-  .empty-note{ font-size: 12.5px; color: var(--ink-soft); padding: 12px 0; }
-  #save-status{ font-size: 11.5px; color: var(--ink-soft); margin-top: 6px; min-height: 14px; }
-  #save-status.err{ color: var(--title-red); font-weight:700; }
-  #todo-save-status{ font-size: 11.5px; color: var(--ink-soft); margin-top: 6px; min-height: 14px; }
-  #todo-save-status.err{ color: var(--title-red); font-weight:700; }
-  #run-save-status, #see-carry-status, #export-status{ font-size: 11.5px; color: var(--ink-soft); margin-top: 6px; min-height: 14px; }
-  #run-save-status.err{ color: var(--title-red); font-weight:700; }
-
-  @media (max-width: 720px){
-    .diary-spread{ flex-direction: column; width: var(--page-w); }
-    .spine{ display:none; }
-    .page:first-child{ border-radius: 4px 4px 0 0; padding: 36px 34px 40px; }
-    .page:last-child{ border-radius: 0 0 4px 4px; padding: 36px 34px 40px; }
-  }
-</style>
+    #app-screen { min-height: 100vh; }
+    .top-bar {
+      background: white; padding: 14px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .top-bar h1 { font-size: 18px; font-weight: 700; color: #4f46e5; }
+    .top-bar-right { display: flex; align-items: center; gap: 12px; }
+    .user-email { font-size: 13px; color: #888; }
+    .btn-logout {
+      padding: 7px 16px; background: #f3f4f6;
+      border: none; border-radius: 8px;
+      font-size: 13px; cursor: pointer; color: #333;
+    }
+    .btn-logout:hover { background: #e5e7eb; }
+    .main-content { max-width: 900px; margin: 32px auto; padding: 0 16px; }
+  </style>
 </head>
 <body>
 
-<div id="cover-screen">
-  <div class="brand-caps">PLANDOSEE</div>
-  <div class="brand-script">Diary</div>
-  <div class="page-fold" id="page-fold"></div>
-</div>
+<div id="auth-screen">
+  <div class="auth-box">
+    <h1>플랜두씨 다이어리</h1>
+    <p>로그인하고 나만의 기록을 시작하세요</p>
+    <div class="auth-tabs">
+      <div class="auth-tab active" id="tab-login" onclick="switchTab('login')">로그인</div>
+      <div class="auth-tab" id="tab-signup" onclick="switchTab('signup')">가입</div>
+    </div>
+    <div id="auth-error" class="auth-error hidden"></div>
 
-<div id="app-root">
-  <div class="diary-spread">
-    <div class="close-tab" id="close-tab">다이어리 덮기</div>
-    <div class="spine"></div>
-
-    <div class="page page-left">
-      <h1 class="brand-mark"><span class="brand-caps">PLANDOSEE</span><span class="brand-script">Diary</span></h1>
-      <p class="subhead">계획 → 실제로 한 일 → 돌아보기</p>
-      <p class="tagline">완벽하지 않아도 괜찮아요, 계속 쓰는 게 중요해요</p>
-      <div class="notice">지금은 로그인이 없어 링크를 아는 사람은 누구나 볼 수 있습니다. 남이 봐도 괜찮은 내용만 넣으세요.</div>
-
-      <h2 class="section-title">Calendar</h2>
-      <div class="cal-head">
-        <button type="button" id="cal-prev">‹</button>
-        <span class="cal-title" id="cal-title"></span>
-        <button type="button" id="cal-next">›</button>
+    <div id="form-login">
+      <div class="form-group">
+        <label>이메일</label>
+        <input type="email" id="login-email" placeholder="example@email.com" />
       </div>
-      <table class="cal-grid">
-        <thead><tr><th>일</th><th>월</th><th>화</th><th>수</th><th>목</th><th>금</th><th>토</th></tr></thead>
-        <tbody id="cal-body"></tbody>
-      </table>
-      <div class="cal-legend"><span class="swatch"></span> 계획 기간</div>
-
-      <div class="page-turn prev" id="page-turn-prev"></div>
-      <div class="page-turn-label prev" id="page-turn-prev-label">이전장으로</div>
+      <div class="form-group">
+        <label>비밀번호</label>
+        <input type="password" id="login-password" placeholder="비밀번호 입력" />
+      </div>
+      <button class="btn-primary" onclick="handleLogin()">로그인</button>
     </div>
 
-    <div class="page page-right">
-      <div class="page-num" id="page-num"></div>
-
-      <div class="sheet" id="sheet-plan">
-      <h2 class="section-title" style="margin-top:0;">Plan</h2>
-
-      <form id="plan-form">
-        <div class="field-row">
-          <label>기간</label>
-          <div class="period-row">
-            <input type="date" id="period-start" required>
-            <span>~</span>
-            <input type="date" id="period-end" required>
-          </div>
-        </div>
-
-        <div class="field-row">
-          <label>우선순위</label>
-          <div class="priority-options">
-            <label><input type="radio" name="priority" value="높음" checked><span>높음</span></label>
-            <label><input type="radio" name="priority" value="중간"><span>중간</span></label>
-            <label><input type="radio" name="priority" value="낮음"><span>낮음</span></label>
-          </div>
-        </div>
-
-        <div class="field-row">
-          <label>성공 기준</label>
-          <textarea id="success-criteria" placeholder="예: 주 3회 이상, 웨이트 40분 + 유산소 20분" required></textarea>
-        </div>
-
-        <div class="field-row">
-          <label>예상 시간</label>
-          <div class="est-row">
-            <input type="number" id="estimated-minutes" min="0" required>
-            <span>분</span>
-          </div>
-        </div>
-
-        <div class="form-actions">
-          <button type="button" class="btn-cancel" id="btn-cancel">수정 취소</button>
-          <button type="submit" class="btn-save" id="btn-save">계획 저장</button>
-        </div>
-        <div id="save-status"></div>
-      </form>
-
-      <h2 class="section-title">Saved Plans</h2>
-      <div id="plan-list"><div class="empty-note">불러오는 중...</div></div>
-      </div><!-- /sheet-plan -->
-
-      <div class="sheet" id="sheet-todo" style="display:none;">
-      <h2 class="section-title" style="margin-top:0;">Todo</h2>
-
-      <form id="todo-form">
-        <div class="field-row">
-          <label>이 할 일이 딸린 계획</label>
-          <select id="todo-plan-select" required></select>
-        </div>
-        <div class="field-row">
-          <label>제목</label>
-          <input type="text" id="todo-title" required>
-        </div>
-        <div class="field-row">
-          <label>내용</label>
-          <textarea id="todo-content" placeholder="구체적으로 뭘 할지"></textarea>
-        </div>
-        <div class="field-row">
-          <div class="period-row">
-            <div style="flex:1;">
-              <label>마감일</label>
-              <input type="date" id="todo-due">
-            </div>
-            <div style="flex:1;">
-              <label>예상 시간</label>
-              <input type="number" id="todo-estimated" min="0" placeholder="분">
-            </div>
-          </div>
-        </div>
-        <div class="field-row">
-          <label>우선순위</label>
-          <div class="priority-options">
-            <label><input type="radio" name="todo-priority" value="높음" checked><span>높음</span></label>
-            <label><input type="radio" name="todo-priority" value="중간"><span>중간</span></label>
-            <label><input type="radio" name="todo-priority" value="낮음"><span>낮음</span></label>
-          </div>
-        </div>
-        <div class="field-row">
-          <label>태그 (쉼표로 구분, 예: 근력,아침)</label>
-          <input type="text" id="todo-tags" placeholder="근력, 아침">
-        </div>
-        <div class="form-actions">
-          <button type="button" class="btn-cancel" id="todo-btn-cancel">수정 취소</button>
-          <button type="submit" class="btn-save" id="todo-btn-save">할 일 저장</button>
-        </div>
-        <div id="todo-save-status"></div>
-      </form>
-
-      <div class="todo-controls">
-        <input type="text" id="todo-search" placeholder="검색 (제목·내용)">
-        <select id="todo-filter-status">
-          <option value="all">전체</option>
-          <option value="in_progress">진행중</option>
-          <option value="done">완료</option>
-        </select>
-        <select id="todo-sort">
-          <option value="due_asc">마감일 빠른순</option>
-          <option value="priority">우선순위순 (높음→낮음)</option>
-          <option value="estimated_desc">예상시간 많은순</option>
-        </select>
+    <div id="form-signup" class="hidden">
+      <div class="form-group">
+        <label>이메일</label>
+        <input type="email" id="signup-email" placeholder="example@email.com" />
       </div>
-      <div class="sort-label" id="todo-sort-label"></div>
-
-      <div class="drill-banner" id="drill-banner" style="display:none;">
-        <span id="drill-banner-text"></span>
-        <button type="button" id="drill-clear">필터 초기화</button>
+      <div class="form-group">
+        <label>비밀번호 (6자 이상)</label>
+        <input type="password" id="signup-password" placeholder="비밀번호 입력" />
       </div>
-
-      <div id="todo-list"><div class="empty-note">불러오는 중...</div></div>
-      </div><!-- /sheet-todo -->
-
-      <div class="sheet" id="sheet-do" style="display:none;">
-      <h2 class="section-title" style="margin-top:0;">Do</h2>
-
-      <form id="run-form">
-        <div class="field-row">
-          <label>어느 할 일을 했나요</label>
-          <select id="run-todo-select" required></select>
-        </div>
-        <div class="field-row">
-          <div class="period-row">
-            <div style="flex:1;">
-              <label>시작 시각</label>
-              <input type="datetime-local" id="run-start" required>
-            </div>
-            <div style="flex:1;">
-              <label>끝난 시각</label>
-              <input type="datetime-local" id="run-end" required>
-            </div>
-          </div>
-        </div>
-        <div class="field-row">
-          <label>막혔던 이유 (없으면 비워두세요)</label>
-          <input type="text" id="run-blocked" placeholder="예: 비가 와서 못 나감">
-        </div>
-        <div class="form-actions">
-          <button type="submit" class="btn-save" id="run-btn-save">실행 기록 저장</button>
-        </div>
-        <div id="run-save-status"></div>
-      </form>
-
-      <h2 class="section-title">Log</h2>
-      <div id="run-list"><div class="empty-note">불러오는 중...</div></div>
-      </div><!-- /sheet-do -->
-
-      <div class="sheet" id="sheet-see" style="display:none;">
-      <h2 class="section-title" style="margin-top:0;">See</h2>
-
-      <div class="field-row">
-        <label>어느 계획을 돌아볼까요</label>
-        <select id="see-plan-select"></select>
+      <div class="form-group">
+        <label>비밀번호 확인</label>
+        <input type="password" id="signup-password2" placeholder="비밀번호 재입력" />
       </div>
-
-      <div id="see-stats"><div class="empty-note">불러오는 중...</div></div>
-
-      <h2 class="section-title">Next</h2>
-      <div class="field-row">
-        <label>이번에 돌아보고 고칠 점 한 줄</label>
-        <textarea id="see-note" placeholder="예: 저녁 약속이 잦아서 오전 운동으로 바꾸자"></textarea>
-      </div>
-      <div class="form-actions">
-        <button type="button" class="btn-save" id="see-carry-btn">다음 계획에 반영하기</button>
-      </div>
-      <div id="see-carry-status"></div>
-
-      <h2 class="section-title">Export</h2>
-      <div class="form-actions" style="justify-content:flex-start;">
-        <button type="button" class="btn-save" id="export-btn">전체 자료 내보내기 (JSON)</button>
-      </div>
-      <div id="export-status"></div>
-      </div><!-- /sheet-see -->
-
-      <div class="page-turn next" id="page-turn-next"></div>
-      <div class="page-turn-label next" id="page-turn-next-label">다음장으로</div>
+      <button class="btn-primary" onclick="handleSignup()">가입하기</button>
     </div>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<div id="app-screen" class="hidden">
+  <div class="top-bar">
+    <h1>📓 플랜두씨 다이어리</h1>
+    <div class="top-bar-right">
+      <span class="user-email" id="user-email-display"></span>
+      <button class="btn-logout" onclick="handleLogout()">로그아웃</button>
+    </div>
+  </div>
+  <div class="main-content" id="main-content">
+    <p style="color:#888; margin-top:40px; text-align:center;">로그인 완료! 다이어리 내용을 불러오는 중...</p>
+  </div>
+</div>
 <script>
-(function(){
-  "use strict";
+  const SUPABASE_URL = 'https://kdlnzkdltpccimhnbvdz.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkbG56a2RsdHBjY2ltaG5idmR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk0MzU4ODcsImV4cCI6MjEwNTAxMTg4N30._iv7SyzGqQWtlyRoZNgAuIVqMF8O0EpKNZBRmXHfPvs';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  var SUPABASE_URL = "https://kdlnzkdltpccimhnbvdz.supabase.co";
-  var SUPABASE_KEY = "sb_publishable_v5p97keSIDRtbqb30A3lSg_InIw8b5K";
-  var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-  var coverScreen = document.getElementById('cover-screen');
-  var pageFold = document.getElementById('page-fold');
-  var appRoot = document.getElementById('app-root');
-  var closeTab = document.getElementById('close-tab');
-  var appStarted = false;
-
-  pageFold.addEventListener('click', function(){
-    coverScreen.style.display = 'none';
-    appRoot.classList.add('open');
-    if(!appStarted){ appStarted = true; startApp(); }
-  });
-  closeTab.addEventListener('click', function(){
-    appRoot.classList.remove('open');
-    coverScreen.style.display = 'flex';
-  });
-
-  /* ---------- 시트(페이지 넘김) ---------- */
-  var SHEETS = ['sheet-plan', 'sheet-todo', 'sheet-do', 'sheet-see'];
-  var SHEET_LABELS = {
-    'sheet-plan':'1 / 4 · Plan',
-    'sheet-todo':'2 / 4 · Todo',
-    'sheet-do':'3 / 4 · Do',
-    'sheet-see':'4 / 4 · See'
-  };
-  var currentSheetIndex = 0;
-  var pageNumEl = document.getElementById('page-num');
-  var turnPrevEl = document.getElementById('page-turn-prev');
-  var turnNextEl = document.getElementById('page-turn-next');
-  var turnPrevLabelEl = document.getElementById('page-turn-prev-label');
-  var turnNextLabelEl = document.getElementById('page-turn-next-label');
-
-  function showSheet(idx){
-    currentSheetIndex = idx;
-    SHEETS.forEach(function(id, i){
-      document.getElementById(id).style.display = (i === idx) ? '' : 'none';
-    });
-    pageNumEl.textContent = SHEET_LABELS[SHEETS[idx]];
-    turnPrevEl.classList.toggle('hidden', idx === 0);
-    turnPrevLabelEl.classList.toggle('hidden', idx === 0);
-    turnNextEl.classList.toggle('hidden', idx === SHEETS.length - 1);
-    turnNextLabelEl.classList.toggle('hidden', idx === SHEETS.length - 1);
+  function switchTab(tab) {
+    document.getElementById('form-login').classList.toggle('hidden', tab !== 'login');
+    document.getElementById('form-signup').classList.toggle('hidden', tab !== 'signup');
+    document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+    document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+    hideError();
   }
-  turnNextEl.addEventListener('click', function(){
-    if(currentSheetIndex < SHEETS.length - 1) showSheet(currentSheetIndex + 1);
-  });
-  turnPrevEl.addEventListener('click', function(){
-    if(currentSheetIndex > 0) showSheet(currentSheetIndex - 1);
-  });
 
-  var form = document.getElementById('plan-form');
-  var periodStart = document.getElementById('period-start');
-  var periodEnd = document.getElementById('period-end');
-  var successCriteria = document.getElementById('success-criteria');
-  var estimatedMinutes = document.getElementById('estimated-minutes');
-  var btnSave = document.getElementById('btn-save');
-  var btnCancel = document.getElementById('btn-cancel');
-  var saveStatus = document.getElementById('save-status');
-  var planListEl = document.getElementById('plan-list');
-
-  var editingPlanId = null;
-  var currentPlans = [];
-  var calYear, calMonth;
-
-  function todayISO(offsetDays){
-    var d = new Date();
-    d.setDate(d.getDate() + (offsetDays || 0));
-    return d.toISOString().slice(0,10);
+  function showError(msg) {
+    const el = document.getElementById('auth-error');
+    el.textContent = msg;
+    el.classList.remove('hidden');
   }
-  function pad2(n){ return String(n).padStart(2,'0'); }
+  function hideError() {
+    document.getElementById('auth-error').classList.add('hidden');
+  }
 
-  function getPriorityValue(){
-    var checked = form.querySelector('input[name="priority"]:checked');
-    return checked ? checked.value : '중간';
+  async function handleLogin() {
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    if (!email || !password) { showError('이메일과 비밀번호를 입력해주세요.'); return; }
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) { showError('이메일 또는 비밀번호를 확인해주세요.'); return; }
   }
-  function setPriorityValue(v){
-    form.querySelectorAll('input[name="priority"]').forEach(function(r){ r.checked = (r.value === v); });
-  }
-  function setStatus(msg, isErr){
-    saveStatus.textContent = msg;
-    saveStatus.className = isErr ? 'err' : '';
-  }
-  function resetFormToNew(){
-    editingPlanId = null;
-    btnSave.textContent = '계획 저장';
-    btnCancel.classList.remove('show');
-    form.reset();
-    setPriorityValue('중간');
-  }
-  function loadPlanIntoForm(p){
-    editingPlanId = p.id;
-    periodStart.value = p.period_start;
-    periodEnd.value = p.period_end;
-    setPriorityValue(p.priority);
-    successCriteria.value = p.success_criteria;
-    estimatedMinutes.value = p.estimated_minutes;
-    btnSave.textContent = '수정 내용 저장';
-    btnCancel.classList.add('show');
-  }
-  btnCancel.addEventListener('click', resetFormToNew);
 
-  form.addEventListener('submit', async function(e){
-    e.preventDefault();
-    var payload = {
-      period_start: periodStart.value,
-      period_end: periodEnd.value,
-      priority: getPriorityValue(),
-      success_criteria: successCriteria.value,
-      estimated_minutes: Number(estimatedMinutes.value)
-    };
-    btnSave.disabled = true;
-    setStatus('저장하는 중...');
-
-    var result = editingPlanId
-      ? await sb.from('plans').update(payload).eq('id', editingPlanId)
-      : await sb.from('plans').insert(payload);
-
-    btnSave.disabled = false;
-    if(result.error){
-      setStatus('✕ 저장 실패: ' + result.error.message, true);
+  async function handleSignup() {
+    const email = document.getElementById('signup-email').value.trim();
+    const password = document.getElementById('signup-password').value;
+    const password2 = document.getElementById('signup-password2').value;
+    if (!email || !password) { showError('이메일과 비밀번호를 입력해주세요.'); return; }
+    if (password !== password2) { showError('비밀번호가 일치하지 않습니다.'); return; }
+    if (password.length < 6) { showError('비밀번호는 6자 이상이어야 합니다.'); return; }
+    const { error } = await sb.auth.signUp({ email, password });
+    if (error) {
+      if (error.message.includes('already registered')) {
+        showError('이미 가입된 이메일입니다.');
+      } else {
+        showError('가입 중 오류가 발생했습니다.');
+      }
       return;
     }
-    setStatus(editingPlanId ? '수정 내용이 저장됐습니다 (이전 내용은 이력에 남았습니다)' : '새 계획이 저장됐습니다');
-    resetFormToNew();
-    await loadPlansAndRender();
-  });
-
-  async function fetchRevisions(planId){
-    var res = await sb.from('plan_revisions').select('*').eq('plan_id', planId).order('revised_at', { ascending:false });
-    return res.error ? [] : (res.data || []);
+    alert('가입 완료! 로그인해주세요.');
+    switchTab('login');
   }
 
-  function renderPlanList(plans){
-    if(plans.length === 0){
-      planListEl.innerHTML = '<div class="empty-note">저장된 계획이 없습니다.</div>';
-      return;
-    }
-    planListEl.innerHTML = '';
-    plans.forEach(function(p){
-      var entry = document.createElement('div');
-      entry.className = 'plan-entry';
-
-      var period = document.createElement('div');
-      period.className = 'period';
-      period.textContent = p.period_start + ' ~ ' + p.period_end;
-
-      var priorityLine = document.createElement('div');
-      priorityLine.className = 'meta-line';
-      priorityLine.innerHTML = '우선순위: <b>' + p.priority + '</b>';
-
-      var criteriaLine = document.createElement('div');
-      criteriaLine.className = 'meta-line';
-      criteriaLine.textContent = '성공 기준: ' + p.success_criteria;
-
-      var estLine = document.createElement('div');
-      estLine.className = 'meta-line';
-      estLine.textContent = '예상 시간: ' + p.estimated_minutes + '분';
-
-      var actions = document.createElement('div');
-      actions.className = 'entry-actions';
-
-      var editBtn = document.createElement('button');
-      editBtn.type = 'button';
-      editBtn.textContent = '수정';
-      editBtn.addEventListener('click', function(){ loadPlanIntoForm(p); });
-
-      var revBtn = document.createElement('button');
-      revBtn.type = 'button';
-      revBtn.textContent = '이전 버전 보기';
-
-      var revBox = document.createElement('div');
-      revBox.className = 'revisions';
-      var loaded = false;
-
-      revBtn.addEventListener('click', async function(){
-        var isOpen = revBox.classList.contains('open');
-        if(isOpen){ revBox.classList.remove('open'); revBtn.textContent = '이전 버전 보기'; return; }
-        revBtn.textContent = '이전 버전 닫기';
-        revBox.classList.add('open');
-        if(!loaded){
-          revBox.innerHTML = '<div class="rev-empty">불러오는 중...</div>';
-          var revisions = await fetchRevisions(p.id);
-          loaded = true;
-          if(revisions.length === 0){
-            revBox.innerHTML = '<div class="rev-empty">아직 수정 이력이 없습니다</div>';
-            return;
-          }
-          revBox.innerHTML = '';
-          revisions.forEach(function(r){
-            var item = document.createElement('div');
-            item.className = 'rev-item';
-            var when = new Date(r.revised_at).toLocaleString('ko-KR');
-            item.textContent = when + ' 수정 전 — ' + r.period_start + '~' + r.period_end + ' / ' + r.priority + ' / ' + r.success_criteria + ' / ' + r.estimated_minutes + '분';
-            revBox.appendChild(item);
-          });
-        }
-      });
-
-      actions.appendChild(editBtn);
-      actions.appendChild(revBtn);
-
-      entry.appendChild(period);
-      entry.appendChild(priorityLine);
-      entry.appendChild(criteriaLine);
-      entry.appendChild(estLine);
-      entry.appendChild(actions);
-      entry.appendChild(revBox);
-      planListEl.appendChild(entry);
-    });
+  async function handleLogout() {
+    await sb.auth.signOut();
   }
 
-  var calTitleEl = document.getElementById('cal-title');
-  var calBodyEl = document.getElementById('cal-body');
-
-  function dateInAnyPlan(dateStr){
-    return currentPlans.some(function(p){
-      return dateStr >= p.period_start && dateStr <= p.period_end;
-    });
+  function showApp(user) {
+    document.getElementById('auth-screen').classList.add('hidden');
+    document.getElementById('app-screen').classList.remove('hidden');
+    document.getElementById('user-email-display').textContent = user.email;
+  }
+  function showAuth() {
+    document.getElementById('auth-screen').classList.remove('hidden');
+    document.getElementById('app-screen').classList.add('hidden');
   }
 
-  function renderCalendar(){
-    var first = new Date(calYear, calMonth, 1);
-    var startDow = first.getDay();
-    var daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
-    var todayStr = todayISO(0);
-
-    calTitleEl.textContent = calYear + '. ' + pad2(calMonth+1);
-
-    var rows = [];
-    var cells = [];
-    for(var i=0;i<startDow;i++){ cells.push('<td class="blank"></td>'); }
-    for(var d=1; d<=daysInMonth; d++){
-      var dateStr = calYear + '-' + pad2(calMonth+1) + '-' + pad2(d);
-      var cls = [];
-      if(dateInAnyPlan(dateStr)) cls.push('in-plan');
-      if(dateStr === todayStr) cls.push('today');
-      var inner = (dateStr === todayStr) ? '<span>'+d+'</span>' : d;
-      cells.push('<td class="'+cls.join(' ')+'">'+inner+'</td>');
-      if(cells.length === 7){ rows.push('<tr>'+cells.join('')+'</tr>'); cells = []; }
-    }
-    if(cells.length){
-      while(cells.length < 7){ cells.push('<td class="blank"></td>'); }
-      rows.push('<tr>'+cells.join('')+'</tr>');
-    }
-    calBodyEl.innerHTML = rows.join('');
-  }
-
-  document.getElementById('cal-prev').addEventListener('click', function(){
-    calMonth--; if(calMonth < 0){ calMonth = 11; calYear--; }
-    renderCalendar();
-  });
-  document.getElementById('cal-next').addEventListener('click', function(){
-    calMonth++; if(calMonth > 11){ calMonth = 0; calYear++; }
-    renderCalendar();
-  });
-
-  async function loadPlansAndRender(){
-    planListEl.innerHTML = '<div class="empty-note">불러오는 중...</div>';
-    var res = await sb.from('plans').select('*').order('created_at', { ascending:false });
-    if(res.error){
-      planListEl.innerHTML = '<div class="empty-note">✕ 목록을 불러오지 못했습니다: ' + res.error.message + '</div>';
-      currentPlans = [];
-      renderCalendar();
-      return;
-    }
-    currentPlans = res.data || [];
-    renderPlanList(currentPlans);
-    renderCalendar();
-    populatePlanSelect();
-    populateSeePlanSelect();
-  }
-
-  async function seedExampleIfEmpty(){
-    var res = await sb.from('plans').select('id', { count:'exact', head:true });
-    if(res.error){ return; }
-    if(res.count && res.count > 0){ return; }
-    await sb.from('plans').insert({
-      period_start: todayISO(0),
-      period_end: todayISO(27),
-      priority: '높음',
-      success_criteria: '주 3회 이상, 웨이트 40분 + 유산소 20분',
-      estimated_minutes: 720
-    });
-  }
-
-  /* ================= 할 일 (카드2) ================= */
-  var todoForm = document.getElementById('todo-form');
-  var todoPlanSelect = document.getElementById('todo-plan-select');
-  var todoTitle = document.getElementById('todo-title');
-  var todoContent = document.getElementById('todo-content');
-  var todoDue = document.getElementById('todo-due');
-  var todoEstimated = document.getElementById('todo-estimated');
-  var todoTags = document.getElementById('todo-tags');
-  var todoBtnSave = document.getElementById('todo-btn-save');
-  var todoBtnCancel = document.getElementById('todo-btn-cancel');
-  var todoSaveStatus = document.getElementById('todo-save-status');
-  var todoListEl = document.getElementById('todo-list');
-  var todoSearchEl = document.getElementById('todo-search');
-  var todoFilterEl = document.getElementById('todo-filter-status');
-  var todoSortEl = document.getElementById('todo-sort');
-  var todoSortLabelEl = document.getElementById('todo-sort-label');
-
-  var editingTodoId = null;
-  var currentTodos = [];
-
-  var SORT_LABELS = {
-    due_asc: '정렬 기준: 마감일이 빠른 순',
-    priority: '정렬 기준: 우선순위 (높음 → 낮음)',
-    estimated_desc: '정렬 기준: 예상 시간이 많은 순'
-  };
-  var PRIORITY_RANK = { '높음':0, '중간':1, '낮음':2 };
-
-  function populatePlanSelect(){
-    var prev = todoPlanSelect.value;
-    todoPlanSelect.innerHTML = '';
-    currentPlans.forEach(function(p){
-      var opt = document.createElement('option');
-      opt.value = p.id;
-      opt.textContent = p.period_start + '~' + p.period_end + ' (' + p.success_criteria.slice(0,16) + (p.success_criteria.length>16?'...':'') + ')';
-      todoPlanSelect.appendChild(opt);
-    });
-    if(prev && currentPlans.some(function(p){ return p.id === prev; })){
-      todoPlanSelect.value = prev;
-    }
-  }
-
-  function getTodoPriorityValue(){
-    var c = todoForm.querySelector('input[name="todo-priority"]:checked');
-    return c ? c.value : '중간';
-  }
-  function setTodoPriorityValue(v){
-    todoForm.querySelectorAll('input[name="todo-priority"]').forEach(function(r){ r.checked = (r.value === v); });
-  }
-  function setTodoStatus(msg, isErr){
-    todoSaveStatus.textContent = msg;
-    todoSaveStatus.className = isErr ? 'err' : '';
-  }
-  function resetTodoForm(){
-    editingTodoId = null;
-    todoBtnSave.textContent = '할 일 저장';
-    todoBtnCancel.classList.remove('show');
-    todoForm.reset();
-    setTodoPriorityValue('중간');
-    populatePlanSelect();
-  }
-  function loadTodoIntoForm(t){
-    editingTodoId = t.id;
-    todoPlanSelect.value = t.plan_id;
-    todoTitle.value = t.title;
-    todoContent.value = t.content || '';
-    todoDue.value = t.due_date || '';
-    todoEstimated.value = t.estimated_minutes;
-    setTodoPriorityValue(t.priority || '중간');
-    todoTags.value = (t.tags || []).join(', ');
-    todoBtnSave.textContent = '수정 내용 저장';
-    todoBtnCancel.classList.add('show');
-  }
-  todoBtnCancel.addEventListener('click', resetTodoForm);
-
-  function parseTags(str){
-    return str.split(',').map(function(s){ return s.trim(); }).filter(function(s){ return s.length > 0; });
-  }
-
-  todoForm.addEventListener('submit', async function(e){
-    e.preventDefault();
-    if(!todoPlanSelect.value){
-      setTodoStatus('✕ 먼저 계획을 하나 이상 저장해주세요', true);
-      return;
-    }
-    var payload = {
-      plan_id: todoPlanSelect.value,
-      title: todoTitle.value,
-      content: todoContent.value,
-      due_date: todoDue.value || null,
-      priority: getTodoPriorityValue(),
-      tags: parseTags(todoTags.value),
-      estimated_minutes: Number(todoEstimated.value || 0)
-    };
-    todoBtnSave.disabled = true;
-    setTodoStatus('저장하는 중...');
-
-    var result = editingTodoId
-      ? await sb.from('todos').update(payload).eq('id', editingTodoId)
-      : await sb.from('todos').insert(payload);
-
-    todoBtnSave.disabled = false;
-    if(result.error){
-      setTodoStatus('✕ 저장 실패: ' + result.error.message, true);
-      return;
-    }
-    setTodoStatus(editingTodoId ? '수정됐습니다' : '새 할 일이 저장됐습니다');
-    resetTodoForm();
-    await loadTodosAndRender();
-  });
-
-  async function toggleTodoComplete(t){
-    if(t.status === 'done'){
-      // 되돌리기: 완료 이벤트 삭제 후 상태 되돌림
-      await sb.from('completion_events').delete().eq('todo_id', t.id);
-      await sb.from('todos').update({ status:'in_progress' }).eq('id', t.id);
+  sb.auth.onAuthStateChange((event, session) => {
+    if (session) {
+      showApp(session.user);
     } else {
-      // 완료: 이벤트가 이미 있으면(연타) unique 제약이 막아주므로 에러는 무시
-      await sb.from('completion_events').insert({ todo_id: t.id });
-      await sb.from('todos').update({ status:'done' }).eq('id', t.id);
+      showAuth();
     }
-    await loadTodosAndRender();
-  }
-
-  async function deleteTodo(t){
-    await sb.from('todos').update({ is_deleted: true }).eq('id', t.id);
-    await loadTodosAndRender();
-  }
-
-  function getFilteredSortedTodos(){
-    var list;
-    if(drillFilter){
-      var today = seoulTodayISO();
-      var blockedIds = blockedTodoIdSet();
-      list = currentTodos.filter(function(t){
-        if(t.plan_id !== drillFilter.planId) return false;
-        if(drillFilter.mode === 'done') return t.status === 'done';
-        if(drillFilter.mode === 'overdue') return t.status !== 'done' && t.due_date && t.due_date < today;
-        if(drillFilter.mode === 'blocked') return blockedIds.has(t.id);
-        return true; // 'all'
-      });
-    } else {
-      var q = todoSearchEl.value.trim().toLowerCase();
-      var statusFilter = todoFilterEl.value;
-      list = currentTodos.filter(function(t){
-        if(q !== ''){
-          var hay = (t.title + ' ' + (t.content||'')).toLowerCase();
-          if(hay.indexOf(q) === -1) return false;
-        }
-        if(statusFilter !== 'all' && t.status !== statusFilter) return false;
-        return true;
-      });
-    }
-    var sortKey = todoSortEl.value;
-    list.sort(function(a,b){
-      if(sortKey === 'due_asc'){
-        var da = a.due_date || '9999-99-99', db = b.due_date || '9999-99-99';
-        if(da !== db) return da < db ? -1 : 1;
-        return a.id < b.id ? -1 : 1;
-      }
-      if(sortKey === 'priority'){
-        var ra = PRIORITY_RANK[a.priority] ?? 1, rb = PRIORITY_RANK[b.priority] ?? 1;
-        if(ra !== rb) return ra - rb;
-        return a.id < b.id ? -1 : 1;
-      }
-      if(sortKey === 'estimated_desc'){
-        if(a.estimated_minutes !== b.estimated_minutes) return b.estimated_minutes - a.estimated_minutes;
-        return a.id < b.id ? -1 : 1;
-      }
-      return 0;
-    });
-    return list;
-  }
-
-  function renderTodoList(){
-    var drillBannerEl = document.getElementById('drill-banner');
-    var drillBannerTextEl = document.getElementById('drill-banner-text');
-    if(drillFilter){
-      var modeText = { all:'전체', done:'완료', overdue:'지연', blocked:'막힘' }[drillFilter.mode] || drillFilter.mode;
-      drillBannerTextEl.textContent = '돌아보기에서 이동함 · "' + modeText + '" 조건의 할 일만 표시 중';
-      drillBannerEl.style.display = 'flex';
-    } else {
-      drillBannerEl.style.display = 'none';
-    }
-    todoSortLabelEl.textContent = SORT_LABELS[todoSortEl.value] || '';
-    var list = getFilteredSortedTodos();
-    if(currentTodos.length === 0){
-      todoListEl.innerHTML = '<div class="empty-note">할 일이 없습니다.</div>';
-      return;
-    }
-    if(list.length === 0){
-      todoListEl.innerHTML = '<div class="empty-note">조건에 맞는 할 일이 없습니다.</div>';
-      return;
-    }
-    todoListEl.innerHTML = '';
-    list.forEach(function(t){
-      var entry = document.createElement('div');
-      entry.className = 'todo-entry' + (t.status === 'done' ? ' done' : '');
-
-      var check = document.createElement('input');
-      check.type = 'checkbox';
-      check.className = 'todo-check';
-      check.checked = (t.status === 'done');
-      check.addEventListener('change', function(){ toggleTodoComplete(t); });
-
-      var body = document.createElement('div');
-      body.className = 'todo-body';
-
-      var title = document.createElement('div');
-      title.className = 'todo-title';
-      title.textContent = t.title;
-
-      var meta = document.createElement('div');
-      meta.className = 'todo-meta';
-      var metaBits = [];
-      if(t.due_date) metaBits.push('마감 ' + t.due_date);
-      metaBits.push('우선순위 ' + t.priority);
-      metaBits.push(t.estimated_minutes + '분');
-      meta.textContent = metaBits.join(' · ');
-
-      var tagsEl = document.createElement('div');
-      tagsEl.className = 'todo-tags';
-      (t.tags || []).forEach(function(tag){
-        var s = document.createElement('span');
-        s.textContent = '#' + tag;
-        tagsEl.appendChild(s);
-      });
-
-      var actions = document.createElement('div');
-      actions.className = 'todo-actions';
-      var editBtn = document.createElement('button');
-      editBtn.type = 'button'; editBtn.textContent = '수정';
-      editBtn.addEventListener('click', function(){ loadTodoIntoForm(t); });
-      var delBtn = document.createElement('button');
-      delBtn.type = 'button'; delBtn.textContent = '삭제';
-      delBtn.addEventListener('click', function(){
-        if(confirm('이 할 일을 지울까요?')) deleteTodo(t);
-      });
-      actions.appendChild(editBtn);
-      actions.appendChild(delBtn);
-
-      body.appendChild(title);
-      body.appendChild(meta);
-      if((t.tags||[]).length) body.appendChild(tagsEl);
-      body.appendChild(actions);
-
-      entry.appendChild(check);
-      entry.appendChild(body);
-      todoListEl.appendChild(entry);
-    });
-  }
-
-  todoSearchEl.addEventListener('input', renderTodoList);
-  todoFilterEl.addEventListener('change', renderTodoList);
-  todoSortEl.addEventListener('change', renderTodoList);
-
-  async function loadTodosAndRender(){
-    todoListEl.innerHTML = '<div class="empty-note">불러오는 중...</div>';
-    var res = await sb.from('todos').select('*').eq('is_deleted', false).order('created_at', { ascending:false });
-    if(res.error){
-      todoListEl.innerHTML = '<div class="empty-note">✕ 목록을 불러오지 못했습니다: ' + res.error.message + '</div>';
-      currentTodos = [];
-      return;
-    }
-    currentTodos = res.data || [];
-    renderTodoList();
-    if(typeof renderSeeStats === 'function') renderSeeStats();
-  }
-
-  async function seedTodosIfEmpty(){
-    var res = await sb.from('todos').select('id', { count:'exact', head:true });
-    if(res.error || (res.count && res.count > 0)) return;
-    var planRes = await sb.from('plans').select('id').order('created_at', { ascending:false }).limit(1);
-    if(planRes.error || !planRes.data || planRes.data.length === 0) return;
-    var planId = planRes.data[0].id;
-
-    var seeds = [
-      { title:'웨이트 - 상체', content:'벤치프레스, 랫풀다운, 숄더프레스', due_date: todayISO(2), priority:'높음', tags:['근력'], estimated_minutes:60 },
-      { title:'웨이트 - 하체', content:'스쿼트, 레그프레스, 런지', due_date: todayISO(4), priority:'높음', tags:['근력'], estimated_minutes:60 },
-      { title:'유산소 - 러닝 5km', content:'페이스 6분/km 목표', due_date: todayISO(1), priority:'중간', tags:['유산소'], estimated_minutes:30 },
-      { title:'유산소 - 사이클', content:'실내 자전거 30분', due_date: todayISO(3), priority:'중간', tags:['유산소'], estimated_minutes:30 },
-      { title:'스트레칭 - 전신', content:'운동 전후 스트레칭', due_date: todayISO(5), priority:'낮음', tags:['회복'], estimated_minutes:20 }
-    ];
-    for(var i=0;i<seeds.length;i++){
-      var s = seeds[i];
-      s.plan_id = planId;
-      await sb.from('todos').insert(s);
-    }
-  }
-
-  /* ================= 실행 기록 (카드3, Do) ================= */
-  var runForm = document.getElementById('run-form');
-  var runTodoSelect = document.getElementById('run-todo-select');
-  var runStart = document.getElementById('run-start');
-  var runEnd = document.getElementById('run-end');
-  var runBlocked = document.getElementById('run-blocked');
-  var runSaveStatus = document.getElementById('run-save-status');
-  var runListEl = document.getElementById('run-list');
-  var currentRunLogs = [];
-
-  function todoTitleById(id){
-    var t = currentTodos.find(function(x){ return x.id === id; });
-    return t ? t.title : '(삭제된 할 일)';
-  }
-
-  function populateRunTodoSelect(){
-    var prev = runTodoSelect.value;
-    runTodoSelect.innerHTML = '';
-    currentTodos.forEach(function(t){
-      var opt = document.createElement('option');
-      opt.value = t.id;
-      opt.textContent = t.title + (t.status==='done' ? ' (완료)' : '');
-      runTodoSelect.appendChild(opt);
-    });
-    if(prev && currentTodos.some(function(t){ return t.id === prev; })){
-      runTodoSelect.value = prev;
-    }
-  }
-
-  function setRunStatus(msg, isErr){
-    runSaveStatus.textContent = msg;
-    runSaveStatus.className = isErr ? 'err' : '';
-  }
-
-  runForm.addEventListener('submit', async function(e){
-    e.preventDefault();
-    if(!runTodoSelect.value){
-      setRunStatus('✕ 먼저 할 일을 하나 이상 만들어주세요', true);
-      return;
-    }
-    var start = new Date(runStart.value);
-    var end = new Date(runEnd.value);
-    if(!(end > start)){
-      setRunStatus('✕ 끝난 시각이 시작 시각보다 늦어야 합니다', true);
-      return;
-    }
-    var actualMinutes = Math.round((end - start) / 60000);
-    var payload = {
-      todo_id: runTodoSelect.value,
-      started_at: start.toISOString(),
-      ended_at: end.toISOString(),
-      actual_minutes: actualMinutes,
-      blocked_reason: runBlocked.value.trim() || null
-    };
-    document.getElementById('run-btn-save').disabled = true;
-    setRunStatus('저장하는 중...');
-    var result = await sb.from('run_logs').insert(payload);
-    document.getElementById('run-btn-save').disabled = false;
-    if(result.error){
-      setRunStatus('✕ 저장 실패: ' + result.error.message, true);
-      return;
-    }
-    setRunStatus('실행 기록이 저장됐습니다 (' + actualMinutes + '분)');
-    runForm.reset();
-    await loadRunLogsAndRender();
-    renderSeeStats();
   });
-
-  function renderRunList(){
-    if(currentRunLogs.length === 0){
-      runListEl.innerHTML = '<div class="empty-note">실행 기록이 없습니다.</div>';
-      return;
-    }
-    runListEl.innerHTML = '';
-    currentRunLogs.forEach(function(r){
-      var entry = document.createElement('div');
-      entry.className = 'run-entry';
-      var title = document.createElement('div');
-      title.className = 'run-todo';
-      title.textContent = todoTitleById(r.todo_id);
-      var meta = document.createElement('div');
-      meta.className = 'run-meta';
-      var s = new Date(r.started_at).toLocaleString('ko-KR');
-      var e = new Date(r.ended_at).toLocaleString('ko-KR');
-      meta.textContent = s + ' ~ ' + e + ' · 실제 ' + r.actual_minutes + '분';
-      entry.appendChild(title);
-      entry.appendChild(meta);
-      if(r.blocked_reason){
-        var blocked = document.createElement('div');
-        blocked.className = 'run-blocked';
-        blocked.textContent = '막힘: ' + r.blocked_reason;
-        entry.appendChild(blocked);
-      }
-      runListEl.appendChild(entry);
-    });
-  }
-
-  async function loadRunLogsAndRender(){
-    runListEl.innerHTML = '<div class="empty-note">불러오는 중...</div>';
-    var res = await sb.from('run_logs').select('*').order('started_at', { ascending:false });
-    if(res.error){
-      runListEl.innerHTML = '<div class="empty-note">✕ 목록을 불러오지 못했습니다: ' + res.error.message + '</div>';
-      currentRunLogs = [];
-      return;
-    }
-    currentRunLogs = res.data || [];
-    populateRunTodoSelect();
-    renderRunList();
-  }
-
-  function blockedTodoIdSet(){
-    var s = new Set();
-    currentRunLogs.forEach(function(r){
-      if(r.blocked_reason && r.blocked_reason.trim() !== '') s.add(r.todo_id);
-    });
-    return s;
-  }
-
-  function seoulTodayISO(){
-    var now = new Date();
-    var utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
-    var seoul = new Date(utcMs + 9 * 3600000);
-    return seoul.getFullYear() + '-' + pad2(seoul.getMonth()+1) + '-' + pad2(seoul.getDate());
-  }
-
-  /* ================= 돌아보기 (카드4, See) ================= */
-  var seePlanSelect = document.getElementById('see-plan-select');
-  var seeStatsEl = document.getElementById('see-stats');
-  var seeNote = document.getElementById('see-note');
-  var seeCarryBtn = document.getElementById('see-carry-btn');
-  var seeCarryStatus = document.getElementById('see-carry-status');
-  var drillFilter = null;
-
-  function populateSeePlanSelect(){
-    var prev = seePlanSelect.value;
-    seePlanSelect.innerHTML = '';
-    currentPlans.forEach(function(p){
-      var opt = document.createElement('option');
-      opt.value = p.id;
-      opt.textContent = p.period_start + '~' + p.period_end + ' (' + p.success_criteria.slice(0,14) + (p.success_criteria.length>14?'...':'') + ')';
-      seePlanSelect.appendChild(opt);
-    });
-    if(prev && currentPlans.some(function(p){ return p.id === prev; })){
-      seePlanSelect.value = prev;
-    }
-  }
-  seePlanSelect.addEventListener('change', renderSeeStats);
-
-  function jumpToTodos(planId, mode){
-    drillFilter = { planId: planId, mode: mode };
-    var idx = SHEETS.indexOf('sheet-todo');
-    showSheet(idx);
-    renderTodoList();
-  }
-
-  document.getElementById('drill-clear').addEventListener('click', function(){
-    drillFilter = null;
-    renderTodoList();
-  });
-
-  function renderSeeStats(){
-    if(!seePlanSelect.value){
-      seeStatsEl.innerHTML = '<div class="empty-note">먼저 계획을 하나 저장해주세요.</div>';
-      return;
-    }
-    var planId = seePlanSelect.value;
-    var todosForPlan = currentTodos.filter(function(t){ return t.plan_id === planId; });
-    var today = seoulTodayISO();
-    var blockedIds = blockedTodoIdSet();
-
-    var planCount = todosForPlan.length;
-    var doneCount = todosForPlan.filter(function(t){ return t.status === 'done'; }).length;
-    var overdueCount = todosForPlan.filter(function(t){
-      return t.status !== 'done' && t.due_date && t.due_date < today;
-    }).length;
-    var blockedCount = todosForPlan.filter(function(t){ return blockedIds.has(t.id); }).length;
-
-    var estSum = todosForPlan.reduce(function(s,t){ return s + (t.estimated_minutes||0); }, 0);
-    var planTodoIds = new Set(todosForPlan.map(function(t){ return t.id; }));
-    var actualSum = currentRunLogs
-      .filter(function(r){ return planTodoIds.has(r.todo_id); })
-      .reduce(function(s,r){ return s + (r.actual_minutes||0); }, 0);
-    var diff = actualSum - estSum;
-
-    seeStatsEl.innerHTML =
-      '<div class="stat-grid">' +
-        '<div class="stat-box"><div class="stat-label">계획 수 (지우지 않은 할 일)</div><div class="stat-num" id="stat-plan">'+planCount+'</div></div>' +
-        '<div class="stat-box"><div class="stat-label">완료 수</div><div class="stat-num" id="stat-done">'+doneCount+'</div></div>' +
-        '<div class="stat-box"><div class="stat-label">지연 수</div><div class="stat-num" id="stat-overdue">'+overdueCount+'</div></div>' +
-        '<div class="stat-box"><div class="stat-label">막힘 수</div><div class="stat-num" id="stat-blocked">'+blockedCount+'</div></div>' +
-      '</div>' +
-      '<div class="time-compare">' +
-        '예상 시간 합계: <b>'+estSum+'분</b><br>' +
-        '실제 시간 합계: <b>'+actualSum+'분</b><br>' +
-        '차이(실제-예상): <b>'+(diff>=0?'+':'')+diff+'분</b>' +
-      '</div>';
-
-    document.getElementById('stat-plan').addEventListener('click', function(){ jumpToTodos(planId, 'all'); });
-    document.getElementById('stat-done').addEventListener('click', function(){ jumpToTodos(planId, 'done'); });
-    document.getElementById('stat-overdue').addEventListener('click', function(){ jumpToTodos(planId, 'overdue'); });
-    document.getElementById('stat-blocked').addEventListener('click', function(){ jumpToTodos(planId, 'blocked'); });
-  }
-
-  seeCarryBtn.addEventListener('click', function(){
-    var note = seeNote.value.trim();
-    if(!note){
-      seeCarryStatus.textContent = '✕ 먼저 고칠 점을 한 줄 적어주세요';
-      seeCarryStatus.className = 'err';
-      return;
-    }
-    resetFormToNew();
-    successCriteria.value = '[돌아보기 반영] ' + note;
-    seeCarryStatus.textContent = '';
-    showSheet(SHEETS.indexOf('sheet-plan'));
-  });
-
-  /* ================= 전체 자료 내보내기 (카드5) ================= */
-  var exportBtn = document.getElementById('export-btn');
-  var exportStatus = document.getElementById('export-status');
-
-  exportBtn.addEventListener('click', async function(){
-    exportBtn.disabled = true;
-    exportStatus.textContent = '자료를 모으는 중...';
-    try{
-      var revRes = await sb.from('plan_revisions').select('*').order('revised_at', { ascending:false });
-      var payload = {
-        exported_at: new Date().toISOString(),
-        schema_version: 'pds-schema-v2',
-        plans: currentPlans,
-        plan_revisions: revRes.data || [],
-        todos: currentTodos,
-        run_logs: currentRunLogs
-      };
-      var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = 'plandosee-export-' + seoulTodayISO() + '.json';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      exportStatus.textContent = '내보내기 완료';
-    } catch(err){
-      exportStatus.textContent = '✕ 내보내기 실패: ' + err.message;
-    }
-    exportBtn.disabled = false;
-  });
-
-  function startApp(){
-    var now = new Date();
-    calYear = now.getFullYear();
-    calMonth = now.getMonth();
-    periodStart.value = todayISO(0);
-    periodEnd.value = todayISO(27);
-    showSheet(0);
-    seedExampleIfEmpty()
-      .then(loadPlansAndRender)
-      .then(seedTodosIfEmpty)
-      .then(loadTodosAndRender)
-      .then(loadRunLogsAndRender)
-      .then(function(){
-        populateSeePlanSelect();
-        renderSeeStats();
-      });
-  }
-
-})();
 </script>
-
 </body>
 </html>
