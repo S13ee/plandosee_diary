@@ -679,6 +679,13 @@
       }
       return;
     }
+    // 이메일 확인이 켜져 있으면 이미 가입된 이메일도 에러 없이 성공 응답을 준다.
+    // 이 경우 user.identities가 빈 배열로 내려오는 것으로 기존 가입 여부를 구분한다.
+    var user = result.data && result.data.user;
+    if(user && Array.isArray(user.identities) && user.identities.length === 0){
+      showError('이미 가입된 이메일입니다.');
+      return;
+    }
     alert('가입 완료! 로그인해주세요.');
     switchTab('login');
   };
